@@ -29,20 +29,20 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Food(
-    val name: String,
-    val quantity: Int,
-    val calories: Int,
-    val protein: Int
+    var name: String,
+    var quantity: Int,
+    var calories: Int,
+    var protein: Int
 )
 
 class FoodConverter {
     @TypeConverter
-    fun fromTagsList(tags: MutableList<Food>?): String {
+    fun fromTagsList(tags: List<Food>?): String {
         return Json.encodeToString(tags ?: emptyList())
     }
 
     @TypeConverter
-    fun toTagsList(tagsString: String): MutableList<Food> {
+    fun toTagsList(tagsString: String): List<Food> {
         return Json.decodeFromString(tagsString)
     }
 }
@@ -68,11 +68,11 @@ data class Task(
     val isCompleted: Boolean = false,
     val calCardio: Int = 0,
     @PrimaryKey val id: String,
-    @TypeConverters(FoodConverter::class) val foods: MutableList<Food> = mutableListOf(Food("fraise", 20,200,20))
+    @TypeConverters(FoodConverter::class) var foods: List<Food> = listOf(Food("fraise", 20,200,20))
 ) {
 
     val titleForList: String
-        get() = if (title.isNotEmpty()) title + " à la " + foods[0].name else description
+        get() = if (title.isNotEmpty()) title else description
 
     val isActive
         get() = !isCompleted

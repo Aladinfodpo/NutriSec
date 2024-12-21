@@ -12,10 +12,6 @@ In this branch you'll find:
 *   A collection of unit, integration and e2e **tests**, including "shared" tests that can be run on emulator/device.
 *   Dependency injection using [Hilt](https://developer.android.com/training/dependency-injection/hilt-android).
 
-## Screenshots
-
-<img src="screenshots/screenshots.png" alt="Screenshot">
-
 ## Why a to-do app?
 
 The app in this project aims to be simple enough that you can understand it quickly, but complex enough to showcase difficult design decisions and testing scenarios. For more information, see the [app's specification](https://github.com/googlesamples/android-architecture/wiki/To-do-app-specification).

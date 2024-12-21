@@ -58,10 +58,12 @@ class DefaultTaskRepository @Inject constructor(
         return taskId
     }
 
-    override suspend fun updateTask(taskId: String, title: String, description: String) {
+    override suspend fun updateTask(taskId: String, title: String, description: String, foods: List<Food>, cardio: Int) {
         val task = getTask(taskId)?.copy(
             title = title,
-            description = description
+            description = description,
+            foods = foods,
+            calCardio = cardio
         ) ?: throw Exception("Task (id $taskId) not found")
 
         localDataSource.upsert(task)

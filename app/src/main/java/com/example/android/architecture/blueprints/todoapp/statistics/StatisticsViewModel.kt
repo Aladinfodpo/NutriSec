@@ -62,7 +62,6 @@ class StatisticsViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            taskRepository.refresh()
         }
     }
 
