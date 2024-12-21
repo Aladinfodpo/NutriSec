@@ -1,6 +1,6 @@
 # Android Architecture Samples
 
-These samples showcase different architectural approaches to developing Android apps. In its different branches you'll find the same app (a TODO app) implemented with small differences.
+These samples showcase different architectural approaches to developing Android apps. In its different branches you'll find the same app (a NutriSec app) implemented with small differences.
 
 In this branch you'll find:
 *   User Interface built with **[Jetpack Compose](https://developer.android.com/jetpack/compose)** 

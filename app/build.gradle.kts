@@ -24,7 +24,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.android.architecture.blueprints.todoapp"
+    namespace = "com.example.android.architecture.blueprints.nutrisecapp"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -34,7 +34,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.example.android.architecture.blueprints.todoapp.CustomTestRunner"
+        testInstrumentationRunner = "com.example.android.architecture.blueprints.nutrisecapp.CustomTestRunner"
 
         javaCompileOptions {
             annotationProcessorOptions {
