@@ -67,13 +67,6 @@ class AddEditTaskViewModel @Inject constructor(
 
     // Called when clicking on fab.
     fun saveTask() {
-        if (uiState.value.task.title.isEmpty()) {
-            _uiState.update {
-                it.copy(userMessage = R.string.empty_task_message)
-            }
-            return
-        }
-
         if (taskId == null) {
             createNewTask()
         } else {

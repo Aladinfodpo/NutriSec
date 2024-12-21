@@ -144,62 +144,57 @@ private fun AddEditTaskContent(
     onFoodProteinChanged: (Int, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier
-            .fillMaxWidth()
-            .padding(all = dimensionResource(id = R.dimen.horizontal_margin))
-            .verticalScroll(rememberScrollState())
-    ) {
+
         val textFieldColors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.Transparent,
             unfocusedBorderColor = Color.Transparent,
             cursorColor = Color.Black,
             //unfocusedContainerColor = Color(red = 200, green = 200, blue = 200, alpha = 50)
         )
-        OutlinedTextField(
-            value = task.title,
-            modifier = Modifier.fillMaxWidth(),
-            onValueChange = onTitleChanged,
-            placeholder = {
-                Text(
-                    text = stringResource(id = R.string.title_hint),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            },
-            textStyle = MaterialTheme.typography.headlineSmall
-                .copy(fontWeight = FontWeight.Bold),
-            maxLines = 1,
-            colors = textFieldColors
-        )
-        /*OutlinedTextField(
-            value = task.description,
-            onValueChange = onDescriptionChanged,
-            placeholder = { Text(stringResource(id = R.string.description_hint)) },
-            modifier = Modifier
-                .height(350.dp)
-                .fillMaxWidth(),
-            colors = textFieldColors
-        )*/
         val numberEditableColors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = primaryDarkColor,
             unfocusedBorderColor = primaryDarkColor,
             cursorColor = Color.Black
         )
-        LazyColumn(modifier = Modifier.wrapContentHeight()) {
+        LazyColumn(
+            modifier = modifier.fillMaxWidth()
+                .padding(all = dimensionResource(id = R.dimen.horizontal_margin))
+        ) {
+            item {
+                OutlinedTextField(
+                    value = task.title,
+                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = onTitleChanged,
+                    placeholder = {
+                        Text(
+                            text = stringResource(id = R.string.title_hint),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    },
+                    textStyle = MaterialTheme.typography.headlineSmall
+                        .copy(fontWeight = FontWeight.Bold),
+                    maxLines = 1,
+                    colors = textFieldColors
+                )
+            }
+
+
             itemsIndexed(task.foods) { i, food ->
-                Row(modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround ){
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
                     OutlinedTextField(
                         value = food.name,
-                        onValueChange = {newValue -> onFoodNameChanged(i, newValue)},
+                        onValueChange = { newValue -> onFoodNameChanged(i, newValue) },
                         placeholder = { Text(stringResource(id = R.string.description_hint)) },
                         modifier = Modifier.widthIn(1.dp, 120.dp),
                         colors = textFieldColors,
                         maxLines = 1,
                     )
                     TextField(
-                        value = food.quantity.let{ if (it == 0) "" else it.toString()},
-                        onValueChange = {newValue -> onFoodQuantityChanged(i, newValue)},
+                        value = food.quantity.let { if (it == 0) "" else it.toString() },
+                        onValueChange = { newValue -> onFoodQuantityChanged(i, newValue) },
                         modifier = Modifier.widthIn(1.dp, 80.dp),
                         colors = textFieldColors,
                         maxLines = 1,
@@ -207,8 +202,8 @@ private fun AddEditTaskContent(
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     )
                     TextField(
-                        value = food.calories.let{ if (it == 0) "" else it.toString()},
-                        onValueChange = {newValue -> onFoodCalorieChanged(i, newValue)},
+                        value = food.calories.let { if (it == 0) "" else it.toString() },
+                        onValueChange = { newValue -> onFoodCalorieChanged(i, newValue) },
                         modifier = Modifier.widthIn(1.dp, 80.dp),
                         colors = textFieldColors,
                         maxLines = 1,
@@ -216,8 +211,8 @@ private fun AddEditTaskContent(
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     )
                     TextField(
-                        value = food.protein.let{ if (it == 0) "" else it.toString()},
-                        onValueChange = {newValue -> onFoodProteinChanged(i, newValue)},
+                        value = food.protein.let { if (it == 0) "" else it.toString() },
+                        onValueChange = { newValue -> onFoodProteinChanged(i, newValue) },
                         modifier = Modifier.widthIn(1.dp, 80.dp),
                         colors = textFieldColors,
                         maxLines = 1,
@@ -226,19 +221,22 @@ private fun AddEditTaskContent(
                     )
                 }
             }
-        }
-        OutlinedTextField(
-            value = task.calCardio.let{ if (it == 0) "" else it.toString()},
-            onValueChange = onCardioChanged,
-            modifier = Modifier.fillMaxWidth(),
-            colors = numberEditableColors,
-            maxLines = 1,
-            shape = RoundedCornerShape(12.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            label = {Text("Cardio")},
-            suffix = {Text("kcal")}
-        )
-        }
+            item {
+                OutlinedTextField(
+                    value = task.calCardio.let { if (it == 0) "" else it.toString() },
+                    onValueChange = onCardioChanged,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = numberEditableColors,
+                    maxLines = 1,
+                    shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    label = { Text("Cardio") },
+                    suffix = { Text("kcal") }
+                )
+            }
+
+    }
+
 }
 
 @Preview

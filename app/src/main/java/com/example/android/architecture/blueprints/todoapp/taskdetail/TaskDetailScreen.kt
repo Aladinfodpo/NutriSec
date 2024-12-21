@@ -128,44 +128,28 @@ private fun EditTaskContent(
         .fillMaxWidth()
         .then(screenPadding)
 
-    LoadingContent(
-        loading = loading,
-        empty = empty,
-        emptyContent = {
-            Text(
-                text = stringResource(id = R.string.no_data),
-                modifier = commonModifier
-            )
-        },
-        onRefresh = onRefresh
-    ) {
-        Column {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .then(screenPadding),
-
-            ) {
-                if (task != null) {
-                    Column (commonModifier.verticalScroll(rememberScrollState())){
-                        Text(text = task.title, style = MaterialTheme.typography.headlineSmall)
-                        LazyColumn(modifier = Modifier.height(100.dp)) {
-                            items(task.foods) { food ->
-                                Row(modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween){
-                                    Text(food.name, textAlign = TextAlign.Center)
-                                    Text(food.quantity.toString() +" g", textAlign = TextAlign.Center)
-                                    Text(food.calories.toString() + " kcal", textAlign = TextAlign.Center)
-                                    Text(food.protein.toString()+" g", textAlign = TextAlign.Center)
-                                }
-                            }
-                        }
-                        Text("Cardio : " +task.calCardio.toString()+" kcal")
+    if (task != null) {
+            LazyColumn(modifier = commonModifier
+                .padding(all = dimensionResource(id = R.dimen.horizontal_margin))) {
+                item{
+                    Text(text = task.title, style = MaterialTheme.typography.headlineSmall)
+                }
+                items(task.foods) { food ->
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween){
+                        Text(food.name, textAlign = TextAlign.Center)
+                        Text(food.quantity.toString() +" g", textAlign = TextAlign.Center)
+                        Text(food.calories.toString() + " kcal", textAlign = TextAlign.Center)
+                        Text(food.protein.toString()+" g", textAlign = TextAlign.Center)
                     }
                 }
+                item{
+                    Text("Cardio : " +task.calCardio.toString()+" kcal")
+                }
             }
-        }
+
     }
+
 }
 
 @Preview

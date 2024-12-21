@@ -98,7 +98,9 @@ fun TodoNavGraph(
                         if (taskId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
                     )
                 },
-                onBack = { navController.popBackStack() }
+                onBack = { navActions.navigateToTasks(
+                    if (taskId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
+                ) }
             )
         }
         composable(TodoDestinations.TASK_DETAIL_ROUTE) {
