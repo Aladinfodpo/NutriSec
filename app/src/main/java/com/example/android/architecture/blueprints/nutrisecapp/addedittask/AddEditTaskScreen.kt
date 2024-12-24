@@ -38,7 +38,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
@@ -91,10 +94,10 @@ fun AddEditTaskScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { AddEditTaskTopAppBar(topBarTitle, {viewModel.saveTask(); onBack()}) },
+        topBar = { AddEditTaskTopAppBar(topBarTitle, {onBack()}) },
         floatingActionButton = {
-            SmallFloatingActionButton(onClick = viewModel::addFood) {
-                Icon(Icons.Filled.Add, stringResource(id = R.string.cd_save_task))
+            SmallFloatingActionButton(onClick = viewModel::saveTask) {
+                Icon(Icons.Filled.Done, stringResource(id = R.string.cd_save_task))
             }
         }
     ) { paddingValues ->
@@ -110,6 +113,8 @@ fun AddEditTaskScreen(
             onFoodQuantityChanged = viewModel::updateFoodIQuantity,
             onFoodCalorieChanged = viewModel::updateFoodICalories,
             onFoodProteinChanged = viewModel::updateFoodIProtein,
+            onAddFood = viewModel::addFood,
+            onRemoveFoodI = viewModel::removeFoodI,
             modifier = Modifier.padding(paddingValues)
         )
 
@@ -138,10 +143,12 @@ private fun AddEditTaskContent(
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     onCardioChanged: (String) -> Unit,
+    onAddFood: () -> Unit,
     onFoodNameChanged: (Int, String) -> Unit,
     onFoodQuantityChanged: (Int, String) -> Unit,
     onFoodCalorieChanged: (Int, String) -> Unit,
     onFoodProteinChanged: (Int, String) -> Unit,
+    onRemoveFoodI: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -156,9 +163,9 @@ private fun AddEditTaskContent(
             unfocusedBorderColor = primaryDarkColor,
             cursorColor = Color.Black
         )
+        Column(){
         LazyColumn(
             modifier = modifier.fillMaxWidth()
-                .padding(all = dimensionResource(id = R.dimen.horizontal_margin))
         ) {
             item {
                 OutlinedTextField(
@@ -188,7 +195,7 @@ private fun AddEditTaskContent(
                         value = food.name,
                         onValueChange = { newValue -> onFoodNameChanged(i, newValue) },
                         placeholder = { Text(stringResource(id = R.string.description_hint)) },
-                        modifier = Modifier.widthIn(1.dp, 120.dp),
+                        modifier = Modifier.weight(1.0F).padding(),
                         colors = textFieldColors,
                         maxLines = 1,
                     )
@@ -219,22 +226,33 @@ private fun AddEditTaskContent(
                         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     )
+                    ElevatedButton(onClick = {onRemoveFoodI(i)}, modifier = Modifier.weight(1.0F) ) { Icon(Icons.Filled.Delete, "Delete")}
                 }
             }
-            item {
-                OutlinedTextField(
-                    value = task.calCardio.let { if (it == 0) "" else it.toString() },
-                    onValueChange = onCardioChanged,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = numberEditableColors,
-                    maxLines = 1,
-                    shape = RoundedCornerShape(12.dp),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    label = { Text("Cardio") },
-                    suffix = { Text("kcal") }
-                )
+            item{
+                ElevatedButton(onClick = onAddFood, modifier = modifier.fillMaxWidth()){ Text("Add food")}
             }
+        }
+        OutlinedTextField(
+            value = task.calCardio.let { if (it == 0) "" else it.toString() },
+            onValueChange = onCardioChanged,
+            modifier = Modifier.fillMaxWidth(),
+            colors = numberEditableColors,
+            maxLines = 1,
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            label = { Text("Cardio") },
+            suffix = { Text("kcal") }
+        )
 
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround){
+            Text("Total")
+            Text(task.foods.sumOf { it.quantity }.toString())
+            Text((task.foods.sumOf { it.calories } - task.calCardio).toString())
+            Text(task.foods.sumOf { it.protein  }.toString())
+            Icon(if (task.foods.sumOf { it.calories }-task.calCardio > 2700) Icons.Filled.Error else Icons.Filled.Done, "Day done")
+        }
     }
 
 }
@@ -260,6 +278,8 @@ private fun AddEditTaskScreenPreview() {
             onFoodQuantityChanged =  {_, _ -> Unit },
             onFoodCalorieChanged = {_, _ -> Unit },
             onFoodProteinChanged = {_, _ -> Unit },
+            onAddFood = {},
+            onRemoveFoodI = {},
             modifier = Modifier
         )
     }
