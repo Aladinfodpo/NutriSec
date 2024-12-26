@@ -25,6 +25,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.Calendar
 
 
 @Serializable
@@ -63,12 +64,12 @@ class FoodConverter {
     tableName = "task"
 )
 data class Task(
-    val title: String = "",
+    val title: String = Calendar.getInstance().let { it.get(Calendar.DAY_OF_MONTH).toString() + "/" + it.get(Calendar.MONTH).toString() +"/"+ it.get(Calendar.YEAR).toString()},
     val description: String = "",
     val isCompleted: Boolean = false,
     val calCardio: Int = 0,
     @PrimaryKey val id: String,
-    @TypeConverters(FoodConverter::class) var foods: List<Food> = listOf(Food("fraise", 20,200,20))
+    @TypeConverters(FoodConverter::class) var foods: List<Food> = emptyList()
 ) {
 
     val titleForList: String
@@ -80,4 +81,9 @@ data class Task(
     val isEmpty
         get() = title.isEmpty() || description.isEmpty()
 
+    val getCalDay: Int
+        get() = foods.sumOf { it.calories } - calCardio
+
+    val isBad: Boolean
+        get() = getCalDay > 2700
 }

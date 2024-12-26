@@ -165,7 +165,7 @@ private fun AddEditTaskContent(
         )
         Column(){
         LazyColumn(
-            modifier = modifier.fillMaxWidth()
+            modifier = modifier.fillMaxWidth().weight(1.0F).padding(8.dp)
         ) {
             item {
                 OutlinedTextField(
@@ -194,7 +194,7 @@ private fun AddEditTaskContent(
                     OutlinedTextField(
                         value = food.name,
                         onValueChange = { newValue -> onFoodNameChanged(i, newValue) },
-                        placeholder = { Text(stringResource(id = R.string.description_hint)) },
+                        placeholder = { Text("Whey") },
                         modifier = Modifier.weight(1.0F).padding(),
                         colors = textFieldColors,
                         maxLines = 1,
@@ -226,7 +226,7 @@ private fun AddEditTaskContent(
                         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     )
-                    ElevatedButton(onClick = {onRemoveFoodI(i)}, modifier = Modifier.weight(1.0F) ) { Icon(Icons.Filled.Delete, "Delete")}
+                    ElevatedButton(onClick = {onRemoveFoodI(i)}, modifier = Modifier.weight(1.0F)) { Icon(Icons.Filled.Delete, "Delete")}
                 }
             }
             item{
@@ -249,9 +249,9 @@ private fun AddEditTaskContent(
             horizontalArrangement = Arrangement.SpaceAround){
             Text("Total")
             Text(task.foods.sumOf { it.quantity }.toString())
-            Text((task.foods.sumOf { it.calories } - task.calCardio).toString())
+            Text(task.getCalDay.toString())
             Text(task.foods.sumOf { it.protein  }.toString())
-            Icon(if (task.foods.sumOf { it.calories }-task.calCardio > 2700) Icons.Filled.Error else Icons.Filled.Done, "Day done")
+            Icon(if (task.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
         }
     }
 
@@ -283,5 +283,46 @@ private fun AddEditTaskScreenPreview() {
             modifier = Modifier
         )
     }
-
 }
+
+@Preview
+@Composable
+private fun FullAddEditTaskScreenPreview() {
+    Surface {
+        AddEditTaskContent(
+            loading = false,
+            task = Task(
+                title = "Title",
+                description = "Description",
+                isCompleted = false,
+                calCardio = 10,
+                id = "ID",
+                foods = listOf(Food("Cerise",100, 200, 3),
+                               Food("Cerise",100, 200, 3),
+                               Food("Cerise",100, 200, 3),
+                               Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3),
+                    Food("Cerise",100, 200, 3))
+            ),
+            onTitleChanged = { },
+            onDescriptionChanged = { },
+            onCardioChanged = { },
+            onFoodNameChanged = {_, _ -> Unit },
+            onFoodQuantityChanged =  {_, _ -> Unit },
+            onFoodCalorieChanged = {_, _ -> Unit },
+            onFoodProteinChanged = {_, _ -> Unit },
+            onAddFood = {},
+            onRemoveFoodI = {},
+            modifier = Modifier
+        )
+    }
+}
+

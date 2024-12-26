@@ -164,7 +164,7 @@ private fun TasksContent(
                     TaskItem(
                         task = task,
                         onTaskClick = onTaskClick,
-                        onCheckedChange = { onTaskCheckedChange(task, it) }
+                        onCheckedChange = { }
                     )
                 }
             }
@@ -189,7 +189,7 @@ private fun TaskItem(
             .clickable { onTaskClick(task) }
     ) {
         Checkbox(
-            checked = task.isCompleted,
+            checked = !task.isBad,
             onCheckedChange = onCheckedChange
         )
         Text(
@@ -198,11 +198,8 @@ private fun TaskItem(
             modifier = Modifier.padding(
                 start = dimensionResource(id = R.dimen.horizontal_margin)
             ),
-            textDecoration = if (task.isCompleted) {
-                TextDecoration.LineThrough
-            } else {
-                null
-            }
+            textDecoration = null
+
         )
     }
 }

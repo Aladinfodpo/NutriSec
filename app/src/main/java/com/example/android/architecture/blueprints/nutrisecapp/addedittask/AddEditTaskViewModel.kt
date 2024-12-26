@@ -104,7 +104,7 @@ class AddEditTaskViewModel @Inject constructor(
     fun removeFoodI(iFood: Int){
         _uiState.update {
 
-            val newFoods = it.task.foods.filterIndexed({i, _ -> i != iFood}) + Food("", 0, 0 ,0)
+            val newFoods = it.task.foods.filterIndexed({i, _ -> i != iFood})
 
             it.copy(task = it.task.copy(foods = newFoods))
         }

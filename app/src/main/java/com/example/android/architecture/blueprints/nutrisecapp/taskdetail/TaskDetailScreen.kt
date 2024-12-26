@@ -29,7 +29,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Label
@@ -145,6 +147,14 @@ private fun EditTaskContent(
                 }
                 item{
                     Text("Cardio : " +task.calCardio.toString()+" kcal")
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround){
+                        Text("Total")
+                        Text(task.foods.sumOf { it.quantity }.toString())
+                        Text(task.getCalDay.toString())
+                        Text(task.foods.sumOf { it.protein  }.toString())
+                        Icon(if (task.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
+                    }
                 }
             }
 
