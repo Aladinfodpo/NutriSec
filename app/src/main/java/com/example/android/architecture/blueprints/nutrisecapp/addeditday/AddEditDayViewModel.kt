@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.nutrisecapp.addeditday
 
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -166,6 +167,14 @@ class AddEditDayViewModel @Inject constructor(
         newCardio.toIntOrNull().let { if(it != null && it < 3000) value = it}
         _uiState.update {
             it.copy(day = it.day.copy(calCardio = value))
+        }
+    }
+
+    fun updateWeight(newWeight: String) {
+        var value = 0.0
+        newWeight.toDoubleOrNull().let { if(it != null && it < 300.0) value = it}
+        _uiState.update {
+            it.copy(day = it.day.copy(weight = value))
         }
     }
 

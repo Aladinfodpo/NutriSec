@@ -38,7 +38,9 @@ data class StatisticsUiState(
     val isEmpty: Boolean = false,
     val isLoading: Boolean = false,
     val activeDaysPercent: Float = 0f,
-    val completedDaysPercent: Float = 0f
+    val completedDaysPercent: Float = 0f,
+    val weights: List<Double> = emptyList(),
+    val dates: List<String> = emptyList()
 )
 
 /**
@@ -80,7 +82,9 @@ class StatisticsViewModel @Inject constructor(
                     isEmpty = dayLoad.data.isEmpty(),
                     activeDaysPercent = stats.activeDaysPercent,
                     completedDaysPercent = stats.completedDaysPercent,
-                    isLoading = false
+                    isLoading = false,
+                    weights = dayLoad.data.map { it.weight },
+                    dates = dayLoad.data.map { it.title }
                 )
             }
         }

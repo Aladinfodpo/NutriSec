@@ -106,6 +106,7 @@ fun AddEditDayScreen(
             onTitleChanged = viewModel::updateTitle,
             onDescriptionChanged = viewModel::updateDescription,
             onCardioChanged = viewModel::updateCardio,
+            onWeightChanged = viewModel::updateWeight,
             onFoodNameChanged = viewModel::updateFoodIName,
             onFoodQuantityChanged = viewModel::updateFoodIQuantity,
             onFoodCalorieChanged = viewModel::updateFoodICalories,
@@ -142,6 +143,7 @@ private fun AddEditDayContent(
     onDescriptionChanged: (String) -> Unit,
     onSaveDay: () -> Unit,
     onCardioChanged: (String) -> Unit,
+    onWeightChanged: (String) -> Unit,
     onAddFood: () -> Unit,
     onFoodNameChanged: (Int, String) -> Unit,
     onFoodQuantityChanged: (Int, String) -> Unit,
@@ -252,7 +254,20 @@ private fun AddEditDayContent(
             Text(day.foods.sumOf { it.protein  }.toString())
             Icon(if (day.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
         }
-            Button(onClick = onSaveDay, modifier = modifier.fillMaxWidth()){ Icon(imageVector = Icons.Filled.Done, contentDescription = "Finish",  tint = { Color.White }())}
+
+        OutlinedTextField(
+            value = day.weight.toString(),
+            onValueChange = onWeightChanged,
+            modifier = Modifier.fillMaxWidth(),
+            colors = numberEditableColors,
+            maxLines = 1,
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            label = { Text("Poids (couché)") },
+            suffix = { Text("kg") }
+        )
+
+        Button(onClick = onSaveDay, modifier = modifier.fillMaxWidth()){ Icon(imageVector = Icons.Filled.Done, contentDescription = "Finish",  tint = { Color.White }())}
     }
 
 }
@@ -274,6 +289,7 @@ private fun AddEditDayScreenPreview() {
             onTitleChanged = { },
             onDescriptionChanged = { },
             onCardioChanged = { },
+            onWeightChanged = { },
             onFoodNameChanged = {_, _ -> Unit },
             onFoodQuantityChanged =  {_, _ -> Unit },
             onFoodCalorieChanged = {_, _ -> Unit },
@@ -316,6 +332,7 @@ private fun FullAddEditDayScreenPreview() {
             onTitleChanged = { },
             onDescriptionChanged = { },
             onCardioChanged = { },
+            onWeightChanged = { },
             onFoodNameChanged = {_, _ -> Unit },
             onFoodQuantityChanged =  {_, _ -> Unit },
             onFoodCalorieChanged = {_, _ -> Unit },
