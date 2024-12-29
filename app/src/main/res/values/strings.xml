@@ -17,37 +17,37 @@
 <resources>
     <string name="version">1.0.2</string>
     <string name="app_name">NutriSec</string>
-    <string name="add_task">New Task</string>
-    <string name="edit_task">Edit Task</string>
-    <string name="task_details">Task Details</string>
-    <string name="task_marked_complete">Task marked complete</string>
-    <string name="task_marked_active">Task marked active</string>
-    <string name="loading_tasks_error">Error while loading tasks</string>
-    <string name="loading_task_error">Error while loading task</string>
-    <string name="task_not_found">Task not found</string>
-    <string name="completed_tasks_cleared">Completed tasks cleared</string>
+    <string name="add_day">New Day</string>
+    <string name="edit_day">Edit Day</string>
+    <string name="day_details">Day Details</string>
+    <string name="day_marked_complete">Day marked complete</string>
+    <string name="day_marked_active">Day marked active</string>
+    <string name="loading_days_error">Error while loading days</string>
+    <string name="loading_day_error">Error while loading day</string>
+    <string name="day_not_found">Day not found</string>
+    <string name="completed_days_cleared">Completed days cleared</string>
     <string name="menu_filter">Filter</string>
     <string name="open_drawer">Open Drawer</string>
     <string name="menu_back">Back</string>
     <string name="menu_clear">Clear completed</string>
-    <string name="menu_delete_task">Delete task</string>
+    <string name="menu_delete_day">Delete day</string>
     <string name="menu_more">More</string>
     <string name="navigation_view_header_title">NutriSec</string>
     <string name="title_hint">Title</string>
-    <string name="description_hint">Enter your task here.</string>
-    <string name="cd_save_task">Save task</string>
-    <string name="empty_task_message">Tasks cannot be empty</string>
-    <string name="successfully_saved_task_message">Task saved</string>
-    <string name="list_title">Task List</string>
+    <string name="description_hint">Enter your day here.</string>
+    <string name="cd_save_day">Save day</string>
+    <string name="empty_day_message">Days cannot be empty</string>
+    <string name="successfully_saved_day_message">Day saved</string>
+    <string name="list_title">Day List</string>
     <string name="statistics_title">Statistics</string>
-    <string name="statistics_no_tasks">You have no tasks.</string>
-    <string name="statistics_active_tasks">Active tasks: %.1f%%</string>
-    <string name="statistics_completed_tasks">Completed tasks: %.1f%%</string>
+    <string name="statistics_no_days">You have no days.</string>
+    <string name="statistics_active_days">Active days: %.1f%%</string>
+    <string name="statistics_completed_days">Completed days: %.1f%%</string>
     <string name="statistics_error">Error loading statistics.</string>
     <string name="no_data">No data</string>
     <string name="loading">LOADING</string>
 
-    <string-array name="list_tasks_array">
+    <string-array name="list_days_array">
         <item>@string/nav_all</item>
         <item>@string/nav_active</item>
         <item>@string/nav_completed</item>
@@ -55,19 +55,19 @@
     <string name="nav_all">All</string>
     <string name="nav_active">Active</string>
     <string name="nav_completed">Completed</string>
-    <string name="label_all">All Tasks</string>
-    <string name="label_active">Active Tasks</string>
-    <string name="label_completed">Completed Tasks</string>
-    <string name="no_tasks_all">You have no tasks!</string>
-    <string name="no_tasks_active">You have no active tasks!</string>
-    <string name="no_tasks_completed">You have no completed tasks!</string>
+    <string name="label_all">All Days</string>
+    <string name="label_active">Active Days</string>
+    <string name="label_completed">Completed Days</string>
+    <string name="no_days_all">You have no days!</string>
+    <string name="no_days_active">You have no active days!</string>
+    <string name="no_days_completed">You have no completed days!</string>
     <string name="refresh">Refresh</string>
-    <string name="successfully_deleted_task_message">Task was deleted</string>
-    <string name="successfully_added_task_message">Task added</string>
+    <string name="successfully_deleted_day_message">Day was deleted</string>
+    <string name="successfully_added_day_message">Day added</string>
     <string name="no_data_description" />
 
     <!-- Content Descriptions -->
-    <string name="tasks_header_image_content_description">Tasks header image</string>
-    <string name="no_tasks_image_content_description">No tasks image</string>
+    <string name="days_header_image_content_description">Days header image</string>
+    <string name="no_days_image_content_description">No days image</string>
 
 </resources>

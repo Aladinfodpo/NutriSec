@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.nutrisecapp.tasks
+package com.example.android.architecture.blueprints.nutrisecapp.days
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -57,54 +57,54 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.nutrisecapp.R
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecTheme
-import com.example.android.architecture.blueprints.nutrisecapp.data.Task
-import com.example.android.architecture.blueprints.nutrisecapp.tasks.TasksFilterType.ACTIVE_TASKS
-import com.example.android.architecture.blueprints.nutrisecapp.tasks.TasksFilterType.ALL_TASKS
-import com.example.android.architecture.blueprints.nutrisecapp.tasks.TasksFilterType.COMPLETED_TASKS
+import com.example.android.architecture.blueprints.nutrisecapp.data.Day
+import com.example.android.architecture.blueprints.nutrisecapp.days.DaysFilterType.ACTIVE_DAYS
+import com.example.android.architecture.blueprints.nutrisecapp.days.DaysFilterType.ALL_DAYS
+import com.example.android.architecture.blueprints.nutrisecapp.days.DaysFilterType.COMPLETED_DAYS
 import com.example.android.architecture.blueprints.nutrisecapp.util.LoadingContent
-import com.example.android.architecture.blueprints.nutrisecapp.util.TasksTopAppBar
+import com.example.android.architecture.blueprints.nutrisecapp.util.DaysTopAppBar
 
 @Composable
-fun TasksScreen(
+fun DaysScreen(
     @StringRes userMessage: Int,
-    onAddTask: () -> Unit,
-    onTaskClick: (Task) -> Unit,
+    onAddDay: () -> Unit,
+    onDayClick: (Day) -> Unit,
     onUserMessageDisplayed: () -> Unit,
     openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TasksViewModel = hiltViewModel(),
+    viewModel: DaysViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TasksTopAppBar(
+            DaysTopAppBar(
                 openDrawer = openDrawer,
-                onFilterAllTasks = { viewModel.setFiltering(ALL_TASKS) },
-                onFilterActiveTasks = { viewModel.setFiltering(ACTIVE_TASKS) },
-                onFilterCompletedTasks = { viewModel.setFiltering(COMPLETED_TASKS) },
-                onClearCompletedTasks = { viewModel.clearCompletedTasks() },
+                onFilterAllDays = { viewModel.setFiltering(ALL_DAYS) },
+                onFilterActiveDays = { viewModel.setFiltering(ACTIVE_DAYS) },
+                onFilterCompletedDays = { viewModel.setFiltering(COMPLETED_DAYS) },
+                onClearCompletedDays = { viewModel.clearCompletedDays() },
                 onRefresh = { viewModel.refresh() }
             )
         },
         floatingActionButton = {
-            SmallFloatingActionButton(onClick = onAddTask) {
-                Icon(Icons.Filled.Add, stringResource(id = R.string.add_task))
+            SmallFloatingActionButton(onClick = onAddDay) {
+                Icon(Icons.Filled.Add, stringResource(id = R.string.add_day))
             }
         }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        TasksContent(
+        DaysContent(
             loading = uiState.isLoading,
-            tasks = uiState.items,
+            days = uiState.items,
             currentFilteringLabel = uiState.filteringUiInfo.currentFilteringLabel,
-            noTasksLabel = uiState.filteringUiInfo.noTasksLabel,
-            noTasksIconRes = uiState.filteringUiInfo.noTaskIconRes,
+            noDaysLabel = uiState.filteringUiInfo.noDaysLabel,
+            noDaysIconRes = uiState.filteringUiInfo.noDayIconRes,
             onRefresh = viewModel::refresh,
-            onTaskClick = onTaskClick,
-            onTaskCheckedChange = viewModel::completeTask,
+            onDayClick = onDayClick,
+            onDayCheckedChange = viewModel::completeDay,
             modifier = Modifier.padding(paddingValues)
         )
 
@@ -129,21 +129,21 @@ fun TasksScreen(
 }
 
 @Composable
-private fun TasksContent(
+private fun DaysContent(
     loading: Boolean,
-    tasks: List<Task>,
+    days: List<Day>,
     @StringRes currentFilteringLabel: Int,
-    @StringRes noTasksLabel: Int,
-    @DrawableRes noTasksIconRes: Int,
+    @StringRes noDaysLabel: Int,
+    @DrawableRes noDaysIconRes: Int,
     onRefresh: () -> Unit,
-    onTaskClick: (Task) -> Unit,
-    onTaskCheckedChange: (Task, Boolean) -> Unit,
+    onDayClick: (Day) -> Unit,
+    onDayCheckedChange: (Day, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LoadingContent(
         loading = loading,
-        empty = tasks.isEmpty() && !loading,
-        emptyContent = { TasksEmptyContent(noTasksLabel, noTasksIconRes, modifier) },
+        empty = days.isEmpty() && !loading,
+        emptyContent = { DaysEmptyContent(noDaysLabel, noDaysIconRes, modifier) },
         onRefresh = onRefresh
     ) {
         Column(
@@ -160,10 +160,10 @@ private fun TasksContent(
                 style = MaterialTheme.typography.headlineSmall
             )
             LazyColumn {
-                items(tasks) { task ->
-                    TaskItem(
-                        task = task,
-                        onTaskClick = onTaskClick,
+                items(days) { day ->
+                    DayItem(
+                        day = day,
+                        onDayClick = onDayClick,
                         onCheckedChange = { }
                     )
                 }
@@ -173,10 +173,10 @@ private fun TasksContent(
 }
 
 @Composable
-private fun TaskItem(
-    task: Task,
+private fun DayItem(
+    day: Day,
     onCheckedChange: (Boolean) -> Unit,
-    onTaskClick: (Task) -> Unit
+    onDayClick: (Day) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -186,14 +186,14 @@ private fun TaskItem(
                 horizontal = dimensionResource(id = R.dimen.horizontal_margin),
                 vertical = dimensionResource(id = R.dimen.list_item_padding),
             )
-            .clickable { onTaskClick(task) }
+            .clickable { onDayClick(day) }
     ) {
         Checkbox(
-            checked = !task.isBad,
+            checked = !day.isBad,
             onCheckedChange = onCheckedChange
         )
         Text(
-            text = task.titleForList,
+            text = day.titleForList,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(
                 start = dimensionResource(id = R.dimen.horizontal_margin)
@@ -205,9 +205,9 @@ private fun TaskItem(
 }
 
 @Composable
-private fun TasksEmptyContent(
-    @StringRes noTasksLabel: Int,
-    @DrawableRes noTasksIconRes: Int,
+private fun DaysEmptyContent(
+    @StringRes noDaysLabel: Int,
+    @DrawableRes noDaysIconRes: Int,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -216,47 +216,47 @@ private fun TasksEmptyContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = noTasksIconRes),
-            contentDescription = stringResource(R.string.no_tasks_image_content_description),
+            painter = painterResource(id = noDaysIconRes),
+            contentDescription = stringResource(R.string.no_days_image_content_description),
             modifier = Modifier.size(96.dp)
         )
-        Text(stringResource(id = noTasksLabel))
+        Text(stringResource(id = noDaysLabel))
     }
 }
 
 @Preview
 @Composable
-private fun TasksContentPreview() {
+private fun DaysContentPreview() {
     MaterialTheme {
         Surface {
-            TasksContent(
+            DaysContent(
                 loading = false,
-                tasks = listOf(
-                    Task(
+                days = listOf(
+                    Day(
                         title = "Title 1",
                         description = "Description 1",
                         isCompleted = false,
                         id = "ID 1"
                     ),
-                    Task(
+                    Day(
                         title = "Title 2",
                         description = "Description 2",
                         isCompleted = true,
                         id = "ID 2"
                     ),
-                    Task(
+                    Day(
                         title = "Title 3",
                         description = "Description 3",
                         isCompleted = true,
                         id = "ID 3"
                     ),
-                    Task(
+                    Day(
                         title = "Title 4",
                         description = "Description 4",
                         isCompleted = false,
                         id = "ID 4"
                     ),
-                    Task(
+                    Day(
                         title = "Title 5",
                         description = "Description 5",
                         isCompleted = true,
@@ -264,11 +264,11 @@ private fun TasksContentPreview() {
                     ),
                 ),
                 currentFilteringLabel = R.string.label_all,
-                noTasksLabel = R.string.no_tasks_all,
-                noTasksIconRes = R.drawable.logo_no_fill,
+                noDaysLabel = R.string.no_days_all,
+                noDaysIconRes = R.drawable.logo_no_fill,
                 onRefresh = { },
-                onTaskClick = { },
-                onTaskCheckedChange = { _, _ -> },
+                onDayClick = { },
+                onDayCheckedChange = { _, _ -> },
             )
         }
     }
@@ -276,18 +276,18 @@ private fun TasksContentPreview() {
 
 @Preview
 @Composable
-private fun TasksContentEmptyPreview() {
+private fun DaysContentEmptyPreview() {
     MaterialTheme {
         Surface {
-            TasksContent(
+            DaysContent(
                 loading = false,
-                tasks = emptyList(),
+                days = emptyList(),
                 currentFilteringLabel = R.string.label_all,
-                noTasksLabel = R.string.no_tasks_all,
-                noTasksIconRes = R.drawable.logo_no_fill,
+                noDaysLabel = R.string.no_days_all,
+                noDaysIconRes = R.drawable.logo_no_fill,
                 onRefresh = { },
-                onTaskClick = { },
-                onTaskCheckedChange = { _, _ -> },
+                onDayClick = { },
+                onDayCheckedChange = { _, _ -> },
             )
         }
     }
@@ -295,12 +295,12 @@ private fun TasksContentEmptyPreview() {
 
 @Preview
 @Composable
-private fun TasksEmptyContentPreview() {
+private fun DaysEmptyContentPreview() {
     NutriSecTheme {
         Surface {
-            TasksEmptyContent(
-                noTasksLabel = R.string.no_tasks_all,
-                noTasksIconRes = R.drawable.logo_no_fill
+            DaysEmptyContent(
+                noDaysLabel = R.string.no_days_all,
+                noDaysIconRes = R.drawable.logo_no_fill
             )
         }
     }
@@ -308,16 +308,16 @@ private fun TasksEmptyContentPreview() {
 
 @Preview
 @Composable
-private fun TaskItemPreview() {
+private fun DayItemPreview() {
     MaterialTheme {
         Surface {
-            TaskItem(
-                task = Task(
+            DayItem(
+                day = Day(
                     title = "Title",
                     description = "Description",
                     id = "ID"
                 ),
-                onTaskClick = { },
+                onDayClick = { },
                 onCheckedChange = { }
             )
         }
@@ -326,17 +326,17 @@ private fun TaskItemPreview() {
 
 @Preview
 @Composable
-private fun TaskItemCompletedPreview() {
+private fun DayItemCompletedPreview() {
     MaterialTheme {
         Surface {
-            TaskItem(
-                task = Task(
+            DayItem(
+                day = Day(
                     title = "Title",
                     description = "Description",
                     isCompleted = true,
                     id = "ID"
                 ),
-                onTaskClick = { },
+                onDayClick = { },
                 onCheckedChange = { }
             )
         }

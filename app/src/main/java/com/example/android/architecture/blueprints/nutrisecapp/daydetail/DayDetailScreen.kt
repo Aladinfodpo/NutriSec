@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.nutrisecapp.taskdetail
+package com.example.android.architecture.blueprints.nutrisecapp.daydetail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -60,38 +60,38 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.nutrisecapp.R
 import com.example.android.architecture.blueprints.nutrisecapp.data.Food
-import com.example.android.architecture.blueprints.nutrisecapp.data.Task
+import com.example.android.architecture.blueprints.nutrisecapp.data.Day
 import com.example.android.architecture.blueprints.nutrisecapp.util.LoadingContent
-import com.example.android.architecture.blueprints.nutrisecapp.util.TaskDetailTopAppBar
+import com.example.android.architecture.blueprints.nutrisecapp.util.DayDetailTopAppBar
 
 @Composable
-fun TaskDetailScreen(
-    onEditTask: (String) -> Unit,
+fun DayDetailScreen(
+    onEditDay: (String) -> Unit,
     onBack: () -> Unit,
-    onDeleteTask: () -> Unit,
+    onDeleteDay: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TaskDetailViewModel = hiltViewModel(),
+    viewModel: DayDetailViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { TaskDetailTopAppBar(onBack = onBack, onDelete = viewModel::deleteTask) },
+        topBar = { DayDetailTopAppBar(onBack = onBack, onDelete = viewModel::deleteDay) },
         floatingActionButton = {
-            SmallFloatingActionButton(onClick = { onEditTask(viewModel.taskId) }) {
-                Icon(Icons.Filled.Edit, stringResource(id = R.string.edit_task))
+            SmallFloatingActionButton(onClick = { onEditDay(viewModel.dayId) }) {
+                Icon(Icons.Filled.Edit, stringResource(id = R.string.edit_day))
             }
         }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        EditTaskContent(
+        EditDayContent(
             loading = uiState.isLoading,
-            empty = uiState.task == null && !uiState.isLoading,
-            task = uiState.task,
+            empty = uiState.day == null && !uiState.isLoading,
+            day = uiState.day,
             onRefresh = viewModel::refresh,
-            onTaskCheck = viewModel::setCompleted,
+            onDayCheck = viewModel::setCompleted,
             modifier = Modifier.padding(paddingValues)
         )
 
@@ -104,21 +104,21 @@ fun TaskDetailScreen(
             }
         }
 
-        // Check if the task is deleted and call onDeleteTask
-        LaunchedEffect(uiState.isTaskDeleted) {
-            if (uiState.isTaskDeleted) {
-                onDeleteTask()
+        // Check if the day is deleted and call onDeleteDay
+        LaunchedEffect(uiState.isDayDeleted) {
+            if (uiState.isDayDeleted) {
+                onDeleteDay()
             }
         }
     }
 }
 
 @Composable
-private fun EditTaskContent(
+private fun EditDayContent(
     loading: Boolean,
     empty: Boolean,
-    task: Task?,
-    onTaskCheck: (Boolean) -> Unit,
+    day: Day?,
+    onDayCheck: (Boolean) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -130,13 +130,13 @@ private fun EditTaskContent(
         .fillMaxWidth()
         .then(screenPadding)
 
-    if (task != null) {
+    if (day != null) {
             LazyColumn(modifier = commonModifier
                 .padding(all = dimensionResource(id = R.dimen.horizontal_margin))) {
                 item{
-                    Text(text = task.title, style = MaterialTheme.typography.headlineSmall)
+                    Text(text = day.title, style = MaterialTheme.typography.headlineSmall)
                 }
-                items(task.foods) { food ->
+                items(day.foods) { food ->
                     Row(modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween){
                         Text(food.name, textAlign = TextAlign.Center)
@@ -146,14 +146,14 @@ private fun EditTaskContent(
                     }
                 }
                 item{
-                    Text("Cardio : " +task.calCardio.toString()+" kcal")
+                    Text("Cardio : " +day.calCardio.toString()+" kcal")
                     Row(modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceAround){
                         Text("Total")
-                        Text(task.foods.sumOf { it.quantity }.toString())
-                        Text(task.getCalDay.toString())
-                        Text(task.foods.sumOf { it.protein  }.toString())
-                        Icon(if (task.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
+                        Text(day.foods.sumOf { it.quantity }.toString())
+                        Text(day.getCalDay.toString())
+                        Text(day.foods.sumOf { it.protein  }.toString())
+                        Icon(if (day.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
                     }
                 }
             }
@@ -164,19 +164,19 @@ private fun EditTaskContent(
 
 @Preview
 @Composable
-private fun EditTaskContentPreview() {
+private fun EditDayContentPreview() {
     Surface {
-        EditTaskContent(
+        EditDayContent(
             loading = false,
             empty = false,
-            Task(
+            Day(
                 title = "Title",
                 description = "Description",
                 isCompleted = false,
                 id = "ID",
                 foods = mutableListOf(Food("Cerise",100, 200, 3), Food("Tomate",10, 2000, 333), Food("Cerise",100, 200, 3))
             ),
-            onTaskCheck = { },
+            onDayCheck = { },
             onRefresh = { }
         )
     }
@@ -185,18 +185,18 @@ private fun EditTaskContentPreview() {
 
 @Preview
 @Composable
-private fun EditTaskContentTaskCompletedPreview() {
+private fun EditDayContentDayCompletedPreview() {
     Surface {
-        EditTaskContent(
+        EditDayContent(
             loading = false,
             empty = false,
-            Task(
+            Day(
                 title = "Title",
                 description = "Description",
                 isCompleted = false,
                 id = "ID"
             ),
-            onTaskCheck = { },
+            onDayCheck = { },
             onRefresh = { }
         )
     }
@@ -204,18 +204,18 @@ private fun EditTaskContentTaskCompletedPreview() {
 
 @Preview
 @Composable
-private fun EditTaskContentEmptyPreview() {
+private fun EditDayContentEmptyPreview() {
     Surface {
-        EditTaskContent(
+        EditDayContent(
             loading = false,
             empty = true,
-            Task(
+            Day(
                 title = "Title",
                 description = "Description",
                 isCompleted = false,
                 id = "ID"
             ),
-            onTaskCheck = { },
+            onDayCheck = { },
             onRefresh = { }
         )
     }

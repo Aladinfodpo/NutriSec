@@ -19,8 +19,8 @@ package com.example.android.architecture.blueprints.nutrisecapp.statistics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.nutrisecapp.R
-import com.example.android.architecture.blueprints.nutrisecapp.data.Task
-import com.example.android.architecture.blueprints.nutrisecapp.data.TaskRepository
+import com.example.android.architecture.blueprints.nutrisecapp.data.Day
+import com.example.android.architecture.blueprints.nutrisecapp.data.DayRepository
 import com.example.android.architecture.blueprints.nutrisecapp.util.Async
 import com.example.android.architecture.blueprints.nutrisecapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,8 +37,8 @@ import javax.inject.Inject
 data class StatisticsUiState(
     val isEmpty: Boolean = false,
     val isLoading: Boolean = false,
-    val activeTasksPercent: Float = 0f,
-    val completedTasksPercent: Float = 0f
+    val activeDaysPercent: Float = 0f,
+    val completedDaysPercent: Float = 0f
 )
 
 /**
@@ -46,14 +46,14 @@ data class StatisticsUiState(
  */
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val dayRepository: DayRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<StatisticsUiState> =
-        taskRepository.getTasksStream()
+        dayRepository.getDaysStream()
             .map { Async.Success(it) }
-            .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
-            .map { taskAsync -> produceStatisticsUiState(taskAsync) }
+            .catch<Async<List<Day>>> { emit(Async.Error(R.string.loading_days_error)) }
+            .map { dayAsync -> produceStatisticsUiState(dayAsync) }
             .stateIn(
                 scope = viewModelScope,
                 started = WhileUiSubscribed,
@@ -65,8 +65,8 @@ class StatisticsViewModel @Inject constructor(
         }
     }
 
-    private fun produceStatisticsUiState(taskLoad: Async<List<Task>>) =
-        when (taskLoad) {
+    private fun produceStatisticsUiState(dayLoad: Async<List<Day>>) =
+        when (dayLoad) {
             Async.Loading -> {
                 StatisticsUiState(isLoading = true, isEmpty = true)
             }
@@ -75,11 +75,11 @@ class StatisticsViewModel @Inject constructor(
                 StatisticsUiState(isEmpty = true, isLoading = false)
             }
             is Async.Success -> {
-                val stats = getActiveAndCompletedStats(taskLoad.data)
+                val stats = getActiveAndCompletedStats(dayLoad.data)
                 StatisticsUiState(
-                    isEmpty = taskLoad.data.isEmpty(),
-                    activeTasksPercent = stats.activeTasksPercent,
-                    completedTasksPercent = stats.completedTasksPercent,
+                    isEmpty = dayLoad.data.isEmpty(),
+                    activeDaysPercent = stats.activeDaysPercent,
+                    completedDaysPercent = stats.completedDaysPercent,
                     isLoading = false
                 )
             }

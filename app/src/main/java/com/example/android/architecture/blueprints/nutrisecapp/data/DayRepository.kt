@@ -21,29 +21,29 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Interface to the data layer.
  */
-interface TaskRepository {
+interface DayRepository {
 
-    fun getTasksStream(): Flow<List<Task>>
+    fun getDaysStream(): Flow<List<Day>>
 
-    suspend fun getTasks(): List<Task>
+    suspend fun getDays(): List<Day>
 
-    fun getTaskStream(taskId: String): Flow<Task?>
+    fun getDayStream(dayId: String): Flow<Day?>
 
-    suspend fun getTask(taskId: String): Task?
+    suspend fun getDay(dayId: String): Day?
 
-    suspend fun refreshTask(taskId: String)
+    suspend fun refreshDay(dayId: String)
 
-    suspend fun createTask(title: String, description: String): String
+    suspend fun createDay(title: String, description: String): String
 
-    suspend fun updateTask(taskId: String, title: String, description: String, foods: List<Food>, cardio: Int)
+    suspend fun updateDay(dayId: String, title: String, description: String, foods: List<Food>, cardio: Int)
 
-    suspend fun completeTask(taskId: String)
+    suspend fun completeDay(dayId: String)
 
-    suspend fun activateTask(taskId: String)
+    suspend fun activateDay(dayId: String)
 
-    suspend fun clearCompletedTasks()
+    suspend fun clearCompletedDays()
 
-    suspend fun deleteAllTasks()
+    suspend fun deleteAllDays()
 
-    suspend fun deleteTask(taskId: String)
+    suspend fun deleteDay(dayId: String)
 }

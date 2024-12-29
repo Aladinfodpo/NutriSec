@@ -19,15 +19,24 @@ package com.example.android.architecture.blueprints.nutrisecapp.data
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 /**
- * The Room Database that contains the Task table.
+ * The Room Database that contains the Day table.
  *
  * Note that exportSchema should be true in production databases.
  */
-@Database(entities = [Task::class], version = 2, exportSchema = false)
+@Database(entities = [Day::class], version = 3, exportSchema = false)
 @TypeConverters(FoodConverter::class)
 abstract class NutriSecDatabase : RoomDatabase() {
 
-    abstract fun taskDao(): TaskDao
+    abstract fun dayDao(): DayDao
+}
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE task RENAME TO Days")
+        db.execSQL("ALTER TABLE Days ADD COLUMN weight INTEGER")
+    }
 }

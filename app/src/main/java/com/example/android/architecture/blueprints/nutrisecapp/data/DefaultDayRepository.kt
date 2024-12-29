@@ -28,7 +28,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Default implementation of [TaskRepository]. Single entry point for managing tasks' data.
+ * Default implementation of [DayRepository]. Single entry point for managing days' data.
  *
  * @param localDataSource - The local data source
  * @param dispatcher - The dispatcher to be used for long running or complex operations, such as ID
@@ -37,80 +37,80 @@ import javax.inject.Singleton
  * as sending data to the network.
  */
 @Singleton
-class DefaultTaskRepository @Inject constructor(
-    private val localDataSource: TaskDao,
+class DefaultDayRepository @Inject constructor(
+    private val localDataSource: DayDao,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope,
-) : TaskRepository {
+) : DayRepository {
 
-    override suspend fun createTask(title: String, description: String): String {
+    override suspend fun createDay(title: String, description: String): String {
         // ID creation might be a complex operation so it's executed using the supplied
         // coroutine dispatcher
-        val taskId = withContext(dispatcher) {
+        val dayId = withContext(dispatcher) {
             UUID.randomUUID().toString()
         }
-        val task = Task(
+        val day = Day(
             title = title,
             description = description,
-            id = taskId,
+            id = dayId,
         )
-        localDataSource.upsert(task)
-        return taskId
+        localDataSource.upsert(day)
+        return dayId
     }
 
-    override suspend fun updateTask(taskId: String, title: String, description: String, foods: List<Food>, cardio: Int) {
-        val task = getTask(taskId)?.copy(
+    override suspend fun updateDay(dayId: String, title: String, description: String, foods: List<Food>, cardio: Int) {
+        val day = getDay(dayId)?.copy(
             title = title,
             description = description,
             foods = foods,
             calCardio = cardio
-        ) ?: throw Exception("Task (id $taskId) not found")
+        ) ?: throw Exception("Day (id $dayId) not found")
 
-        localDataSource.upsert(task)
+        localDataSource.upsert(day)
     }
 
-    override suspend fun getTasks(): List<Task> {
+    override suspend fun getDays(): List<Day> {
         return localDataSource.getAll()
     }
 
-    override fun getTasksStream(): Flow<List<Task>> {
-        return localDataSource.observeAll().map { tasks -> tasks }
+    override fun getDaysStream(): Flow<List<Day>> {
+        return localDataSource.observeAll().map { days -> days }
     }
 
-    override suspend fun refreshTask(taskId: String) {
+    override suspend fun refreshDay(dayId: String) {
     }
 
-    override fun getTaskStream(taskId: String): Flow<Task?> {
-        return localDataSource.observeById(taskId).map { it }
+    override fun getDayStream(dayId: String): Flow<Day?> {
+        return localDataSource.observeById(dayId).map { it }
     }
 
     /**
-     * Get a Task with the given ID. Will return null if the task cannot be found.
+     * Get a Day with the given ID. Will return null if the day cannot be found.
      *
-     * @param taskId - The ID of the task
+     * @param dayId - The ID of the day
      */
-    override suspend fun getTask(taskId: String): Task? {
-        return localDataSource.getById(taskId)
+    override suspend fun getDay(dayId: String): Day? {
+        return localDataSource.getById(dayId)
     }
 
-    override suspend fun completeTask(taskId: String) {
-        localDataSource.updateCompleted(taskId = taskId, completed = true)
+    override suspend fun completeDay(dayId: String) {
+        localDataSource.updateCompleted(dayId = dayId, completed = true)
     }
 
-    override suspend fun activateTask(taskId: String) {
-        localDataSource.updateCompleted(taskId = taskId, completed = false)
+    override suspend fun activateDay(dayId: String) {
+        localDataSource.updateCompleted(dayId = dayId, completed = false)
     }
 
-    override suspend fun clearCompletedTasks() {
+    override suspend fun clearCompletedDays() {
         localDataSource.deleteCompleted()
     }
 
-    override suspend fun deleteAllTasks() {
+    override suspend fun deleteAllDays() {
         localDataSource.deleteAll()
     }
 
-    override suspend fun deleteTask(taskId: String) {
-        localDataSource.deleteById(taskId)
+    override suspend fun deleteDay(dayId: String) {
+        localDataSource.deleteById(dayId)
     }
 
 }

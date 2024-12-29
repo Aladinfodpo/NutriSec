@@ -64,7 +64,7 @@ fun AppModalDrawer(
         drawerContent = {
             AppDrawer(
                 currentRoute = currentRoute,
-                navigateToTasks = { navigationActions.navigateToTasks() },
+                navigateToDays = { navigationActions.navigateToDays() },
                 navigateToStatistics = { navigationActions.navigateToStatistics() },
                 closeDrawer = { coroutineScope.launch { drawerState.close() } }
             )
@@ -77,7 +77,7 @@ fun AppModalDrawer(
 @Composable
 private fun AppDrawer(
     currentRoute: String,
-    navigateToTasks: () -> Unit,
+    navigateToDays: () -> Unit,
     navigateToStatistics: () -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier
@@ -88,9 +88,9 @@ private fun AppDrawer(
             DrawerButton(
                 painter = painterResource(id = R.drawable.ic_list),
                 label = stringResource(id = R.string.list_title),
-                isSelected = currentRoute == NutriSecDestinations.TASKS_ROUTE,
+                isSelected = currentRoute == NutriSecDestinations.DAYS_ROUTE,
                 action = {
-                    navigateToTasks()
+                    navigateToDays()
                     closeDrawer()
                 }
             )
@@ -127,7 +127,7 @@ private fun DrawerHeader(
         Image(
             painter = painterResource(id = R.drawable.logo_no_fill),
             contentDescription =
-            stringResource(id = R.string.tasks_header_image_content_description),
+            stringResource(id = R.string.days_header_image_content_description),
             modifier = Modifier.width(dimensionResource(id = R.dimen.header_image_width))
         )
         Text(
@@ -202,8 +202,8 @@ fun PreviewAppDrawer() {
     NutriSecTheme {
         Surface {
             AppDrawer(
-                currentRoute = NutriSecDestinations.TASKS_ROUTE,
-                navigateToTasks = {},
+                currentRoute = NutriSecDestinations.DAYS_ROUTE,
+                navigateToDays = {},
                 navigateToStatistics = {},
                 closeDrawer = {}
             )

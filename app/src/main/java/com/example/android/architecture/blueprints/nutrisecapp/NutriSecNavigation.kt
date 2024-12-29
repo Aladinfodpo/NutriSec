@@ -18,22 +18,22 @@ package com.example.android.architecture.blueprints.nutrisecapp
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinationsArgs.TASK_ID_ARG
+import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinationsArgs.DAY_ID_ARG
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinationsArgs.TITLE_ARG
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinationsArgs.USER_MESSAGE_ARG
-import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.ADD_EDIT_TASK_SCREEN
+import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.ADD_EDIT_DAY_SCREEN
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.STATISTICS_SCREEN
-import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.TASKS_SCREEN
-import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.TASK_DETAIL_SCREEN
+import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.DAYS_SCREEN
+import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.DAY_DETAIL_SCREEN
 
 /**
  * Screens used in [NutriSecDestinations]
  */
 private object NutriSecScreens {
-    const val TASKS_SCREEN = "tasks"
+    const val DAYS_SCREEN = "days"
     const val STATISTICS_SCREEN = "statistics"
-    const val TASK_DETAIL_SCREEN = "task"
-    const val ADD_EDIT_TASK_SCREEN = "addEditTask"
+    const val DAY_DETAIL_SCREEN = "day"
+    const val ADD_EDIT_DAY_SCREEN = "addEditDay"
 }
 
 /**
@@ -41,7 +41,7 @@ private object NutriSecScreens {
  */
 object NutriSecDestinationsArgs {
     const val USER_MESSAGE_ARG = "userMessage"
-    const val TASK_ID_ARG = "taskId"
+    const val DAY_ID_ARG = "dayId"
     const val TITLE_ARG = "title"
 }
 
@@ -49,10 +49,10 @@ object NutriSecDestinationsArgs {
  * Destinations used in the [NutriSecActivity]
  */
 object NutriSecDestinations {
-    const val TASKS_ROUTE = "$TASKS_SCREEN?$USER_MESSAGE_ARG={$USER_MESSAGE_ARG}"
+    const val DAYS_ROUTE = "$DAYS_SCREEN?$USER_MESSAGE_ARG={$USER_MESSAGE_ARG}"
     const val STATISTICS_ROUTE = STATISTICS_SCREEN
-    const val TASK_DETAIL_ROUTE = "$TASK_DETAIL_SCREEN/{$TASK_ID_ARG}"
-    const val ADD_EDIT_TASK_ROUTE = "$ADD_EDIT_TASK_SCREEN/{$TITLE_ARG}?$TASK_ID_ARG={$TASK_ID_ARG}"
+    const val DAY_DETAIL_ROUTE = "$DAY_DETAIL_SCREEN/{$DAY_ID_ARG}"
+    const val ADD_EDIT_DAY_ROUTE = "$ADD_EDIT_DAY_SCREEN/{$TITLE_ARG}?$DAY_ID_ARG={$DAY_ID_ARG}"
 }
 
 /**
@@ -60,10 +60,10 @@ object NutriSecDestinations {
  */
 class NutriSecNavigationActions(private val navController: NavHostController) {
 
-    fun navigateToTasks(userMessage: Int = 0) {
+    fun navigateToDays(userMessage: Int = 0) {
         val navigatesFromDrawer = userMessage == 0
         navController.navigate(
-            TASKS_SCREEN.let {
+            DAYS_SCREEN.let {
                 if (userMessage != 0) "$it?$USER_MESSAGE_ARG=$userMessage" else it
             }
         ) {
@@ -92,14 +92,14 @@ class NutriSecNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    fun navigateToTaskDetail(taskId: String) {
-        navController.navigate("$TASK_DETAIL_SCREEN/$taskId")
+    fun navigateToDayDetail(dayId: String) {
+        navController.navigate("$DAY_DETAIL_SCREEN/$dayId")
     }
 
-    fun navigateToAddEditTask(title: Int, taskId: String?) {
+    fun navigateToAddEditDay(title: Int, dayId: String?) {
         navController.navigate(
-            "$ADD_EDIT_TASK_SCREEN/$title".let {
-                if (taskId != null) "$it?$TASK_ID_ARG=$taskId" else it
+            "$ADD_EDIT_DAY_SCREEN/$title".let {
+                if (dayId != null) "$it?$DAY_ID_ARG=$dayId" else it
             }
         )
     }

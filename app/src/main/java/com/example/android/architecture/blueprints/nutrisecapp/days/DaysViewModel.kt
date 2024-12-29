@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.nutrisecapp.tasks
+package com.example.android.architecture.blueprints.nutrisecapp.days
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -23,11 +23,11 @@ import com.example.android.architecture.blueprints.nutrisecapp.ADD_EDIT_RESULT_O
 import com.example.android.architecture.blueprints.nutrisecapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.nutrisecapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.nutrisecapp.R
-import com.example.android.architecture.blueprints.nutrisecapp.data.Task
-import com.example.android.architecture.blueprints.nutrisecapp.data.TaskRepository
-import com.example.android.architecture.blueprints.nutrisecapp.tasks.TasksFilterType.ACTIVE_TASKS
-import com.example.android.architecture.blueprints.nutrisecapp.tasks.TasksFilterType.ALL_TASKS
-import com.example.android.architecture.blueprints.nutrisecapp.tasks.TasksFilterType.COMPLETED_TASKS
+import com.example.android.architecture.blueprints.nutrisecapp.data.Day
+import com.example.android.architecture.blueprints.nutrisecapp.data.DayRepository
+import com.example.android.architecture.blueprints.nutrisecapp.days.DaysFilterType.ACTIVE_DAYS
+import com.example.android.architecture.blueprints.nutrisecapp.days.DaysFilterType.ALL_DAYS
+import com.example.android.architecture.blueprints.nutrisecapp.days.DaysFilterType.COMPLETED_DAYS
 import com.example.android.architecture.blueprints.nutrisecapp.util.Async
 import com.example.android.architecture.blueprints.nutrisecapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,50 +42,50 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * UiState for the task list screen.
+ * UiState for the day list screen.
  */
-data class TasksUiState(
-    val items: List<Task> = emptyList(),
+data class DaysUiState(
+    val items: List<Day> = emptyList(),
     val isLoading: Boolean = false,
     val filteringUiInfo: FilteringUiInfo = FilteringUiInfo(),
     val userMessage: Int? = null
 )
 
 /**
- * ViewModel for the task list screen.
+ * ViewModel for the day list screen.
  */
 @HiltViewModel
-class TasksViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
+class DaysViewModel @Inject constructor(
+    private val dayRepository: DayRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _savedFilterType =
-        savedStateHandle.getStateFlow(TASKS_FILTER_SAVED_STATE_KEY, ALL_TASKS)
+        savedStateHandle.getStateFlow(DAYS_FILTER_SAVED_STATE_KEY, ALL_DAYS)
 
     private val _filterUiInfo = _savedFilterType.map { getFilterUiInfo(it) }.distinctUntilChanged()
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
-    private val _filteredTasksAsync =
-        combine(taskRepository.getTasksStream(), _savedFilterType) { tasks, type ->
-            filterTasks(tasks, type)
+    private val _filteredDaysAsync =
+        combine(dayRepository.getDaysStream(), _savedFilterType) { days, type ->
+            filterDays(days, type)
         }
             .map { Async.Success(it) }
-            .catch<Async<List<Task>>> { emit(Async.Error(R.string.loading_tasks_error)) }
+            .catch<Async<List<Day>>> { emit(Async.Error(R.string.loading_days_error)) }
 
-    val uiState: StateFlow<TasksUiState> = combine(
-        _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
-    ) { filterUiInfo, isLoading, userMessage, tasksAsync ->
-        when (tasksAsync) {
+    val uiState: StateFlow<DaysUiState> = combine(
+        _filterUiInfo, _isLoading, _userMessage, _filteredDaysAsync
+    ) { filterUiInfo, isLoading, userMessage, daysAsync ->
+        when (daysAsync) {
             Async.Loading -> {
-                TasksUiState(isLoading = true)
+                DaysUiState(isLoading = true)
             }
             is Async.Error -> {
-                TasksUiState(userMessage = tasksAsync.errorMessage)
+                DaysUiState(userMessage = daysAsync.errorMessage)
             }
             is Async.Success -> {
-                TasksUiState(
-                    items = tasksAsync.data,
+                DaysUiState(
+                    items = daysAsync.data,
                     filteringUiInfo = filterUiInfo,
                     isLoading = isLoading,
                     userMessage = userMessage
@@ -96,36 +96,36 @@ class TasksViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = WhileUiSubscribed,
-            initialValue = TasksUiState(isLoading = true)
+            initialValue = DaysUiState(isLoading = true)
         )
 
-    fun setFiltering(requestType: TasksFilterType) {
-        savedStateHandle[TASKS_FILTER_SAVED_STATE_KEY] = requestType
+    fun setFiltering(requestType: DaysFilterType) {
+        savedStateHandle[DAYS_FILTER_SAVED_STATE_KEY] = requestType
     }
 
-    fun clearCompletedTasks() {
+    fun clearCompletedDays() {
         viewModelScope.launch {
-            taskRepository.clearCompletedTasks()
-            showSnackbarMessage(R.string.completed_tasks_cleared)
+            dayRepository.clearCompletedDays()
+            showSnackbarMessage(R.string.completed_days_cleared)
             refresh()
         }
     }
 
-    fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
+    fun completeDay(day: Day, completed: Boolean) = viewModelScope.launch {
         if (completed) {
-            taskRepository.completeTask(task.id)
-            showSnackbarMessage(R.string.task_marked_complete)
+            dayRepository.completeDay(day.id)
+            showSnackbarMessage(R.string.day_marked_complete)
         } else {
-            taskRepository.activateTask(task.id)
-            showSnackbarMessage(R.string.task_marked_active)
+            dayRepository.activateDay(day.id)
+            showSnackbarMessage(R.string.day_marked_active)
         }
     }
 
     fun showEditResultMessage(result: Int) {
         when (result) {
-            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_task_message)
-            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_task_message)
-            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_task_message)
+            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_day_message)
+            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_day_message)
+            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_day_message)
         }
     }
 
@@ -144,40 +144,40 @@ class TasksViewModel @Inject constructor(
         }
     }
 
-    private fun filterTasks(tasks: List<Task>, filteringType: TasksFilterType): List<Task> {
-        val tasksToShow = ArrayList<Task>()
-        // We filter the tasks based on the requestType
-        for (task in tasks) {
+    private fun filterDays(days: List<Day>, filteringType: DaysFilterType): List<Day> {
+        val daysToShow = ArrayList<Day>()
+        // We filter the days based on the requestType
+        for (day in days) {
             when (filteringType) {
-                ALL_TASKS -> tasksToShow.add(task)
-                ACTIVE_TASKS -> if (task.isActive) {
-                    tasksToShow.add(task)
+                ALL_DAYS -> daysToShow.add(day)
+                ACTIVE_DAYS -> if (day.isActive) {
+                    daysToShow.add(day)
                 }
-                COMPLETED_TASKS -> if (task.isCompleted) {
-                    tasksToShow.add(task)
+                COMPLETED_DAYS -> if (day.isCompleted) {
+                    daysToShow.add(day)
                 }
             }
         }
-        return tasksToShow
+        return daysToShow
     }
 
-    private fun getFilterUiInfo(requestType: TasksFilterType): FilteringUiInfo =
+    private fun getFilterUiInfo(requestType: DaysFilterType): FilteringUiInfo =
         when (requestType) {
-            ALL_TASKS -> {
+            ALL_DAYS -> {
                 FilteringUiInfo(
-                    R.string.label_all, R.string.no_tasks_all,
+                    R.string.label_all, R.string.no_days_all,
                     R.drawable.logo_no_fill
                 )
             }
-            ACTIVE_TASKS -> {
+            ACTIVE_DAYS -> {
                 FilteringUiInfo(
-                    R.string.label_active, R.string.no_tasks_active,
+                    R.string.label_active, R.string.no_days_active,
                     R.drawable.ic_check_circle_96dp
                 )
             }
-            COMPLETED_TASKS -> {
+            COMPLETED_DAYS -> {
                 FilteringUiInfo(
-                    R.string.label_completed, R.string.no_tasks_completed,
+                    R.string.label_completed, R.string.no_days_completed,
                     R.drawable.ic_verified_user_96dp
                 )
             }
@@ -185,10 +185,10 @@ class TasksViewModel @Inject constructor(
 }
 
 // Used to save the current filtering in SavedStateHandle.
-const val TASKS_FILTER_SAVED_STATE_KEY = "TASKS_FILTER_SAVED_STATE_KEY"
+const val DAYS_FILTER_SAVED_STATE_KEY = "DAYS_FILTER_SAVED_STATE_KEY"
 
 data class FilteringUiInfo(
     val currentFilteringLabel: Int = R.string.label_all,
-    val noTasksLabel: Int = R.string.no_tasks_all,
-    val noTaskIconRes: Int = R.drawable.logo_no_fill,
+    val noDaysLabel: Int = R.string.no_days_all,
+    val noDayIconRes: Int = R.drawable.logo_no_fill,
 )

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.nutrisecapp.addedittask
+package com.example.android.architecture.blueprints.nutrisecapp.addeditday
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -22,8 +22,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.nutrisecapp.R
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinationsArgs
 import com.example.android.architecture.blueprints.nutrisecapp.data.Food
-import com.example.android.architecture.blueprints.nutrisecapp.data.Task
-import com.example.android.architecture.blueprints.nutrisecapp.data.TaskRepository
+import com.example.android.architecture.blueprints.nutrisecapp.data.Day
+import com.example.android.architecture.blueprints.nutrisecapp.data.DayRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,42 +35,42 @@ import javax.inject.Inject
 /**
  * UiState for the Add/Edit screen
  */
-data class AddEditTaskUiState(
-    val task : Task,
+data class AddEditDayUiState(
+    val day : Day,
     val isLoading: Boolean = false,
     val userMessage: Int? = null,
-    val isTaskSaved: Boolean = false
+    val isDaySaved: Boolean = false
 )
 
 /**
  * ViewModel for the Add/Edit screen.
  */
 @HiltViewModel
-class AddEditTaskViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
+class AddEditDayViewModel @Inject constructor(
+    private val dayRepository: DayRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val taskId: String? = savedStateHandle[NutriSecDestinationsArgs.TASK_ID_ARG]
+    private val dayId: String? = savedStateHandle[NutriSecDestinationsArgs.DAY_ID_ARG]
 
     // A MutableStateFlow needs to be created in this ViewModel. The source of truth of the current
-    // editable Task is the ViewModel, we need to mutate the UI state directly in methods such as
+    // editable Day is the ViewModel, we need to mutate the UI state directly in methods such as
     // `updateTitle` or `updateDescription`
-    private val _uiState = MutableStateFlow(AddEditTaskUiState(Task(id = savedStateHandle[NutriSecDestinationsArgs.TASK_ID_ARG]?: "")))
-    val uiState: StateFlow<AddEditTaskUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(AddEditDayUiState(Day(id = savedStateHandle[NutriSecDestinationsArgs.DAY_ID_ARG]?: "")))
+    val uiState: StateFlow<AddEditDayUiState> = _uiState.asStateFlow()
 
     init {
-        if (taskId != null) {
-            loadTask(taskId)
+        if (dayId != null) {
+            loadDay(dayId)
         }
     }
 
     // Called when clicking on fab.
-    fun saveTask() {
-        if (taskId == null) {
-            createNewTask()
+    fun saveDay() {
+        if (dayId == null) {
+            createNewDay()
         } else {
-            updateTask()
+            updateDay()
         }
     }
 
@@ -82,42 +82,42 @@ class AddEditTaskViewModel @Inject constructor(
 
     fun updateTitle(newTitle: String) {
         _uiState.update {
-            it.copy(task = it.task.copy(title = newTitle))
+            it.copy(day = it.day.copy(title = newTitle))
         }
     }
 
     fun updateDescription(newDescription: String) {
         _uiState.update {
-            it.copy(task = it.task.copy(description = newDescription))
+            it.copy(day = it.day.copy(description = newDescription))
         }
     }
 
     fun addFood() {
         _uiState.update {
 
-            val newFoods = it.task.foods + Food("", 0, 0 ,0)
+            val newFoods = it.day.foods + Food("", 0, 0 ,0)
 
-            it.copy(task = it.task.copy(foods = newFoods))
+            it.copy(day = it.day.copy(foods = newFoods))
         }
     }
 
     fun removeFoodI(iFood: Int){
         _uiState.update {
 
-            val newFoods = it.task.foods.filterIndexed({i, _ -> i != iFood})
+            val newFoods = it.day.foods.filterIndexed({i, _ -> i != iFood})
 
-            it.copy(task = it.task.copy(foods = newFoods))
+            it.copy(day = it.day.copy(foods = newFoods))
         }
     }
 
     fun updateFoodIName(iFood: Int, newName: String) {
         _uiState.update {
 
-            val newFoods = it.task.foods.mapIndexed { i, food ->
+            val newFoods = it.day.foods.mapIndexed { i, food ->
                 if (i == iFood) food.copy(name = newName) else food
             }
 
-            it.copy(task = it.task.copy(foods = newFoods))
+            it.copy(day = it.day.copy(foods = newFoods))
         }
     }
 
@@ -127,11 +127,11 @@ class AddEditTaskViewModel @Inject constructor(
 
         _uiState.update {
 
-            val newFoods = it.task.foods.mapIndexed { i, food ->
+            val newFoods = it.day.foods.mapIndexed { i, food ->
                 if (i == iFood) food.copy(quantity = value) else food
             }
 
-            it.copy(task = it.task.copy(foods = newFoods))
+            it.copy(day = it.day.copy(foods = newFoods))
         }
     }
 
@@ -140,11 +140,11 @@ class AddEditTaskViewModel @Inject constructor(
         newCalories.toIntOrNull().let {it -> if(it != null && it < 3000) value = it}
         _uiState.update {
 
-            val newFoods = it.task.foods.mapIndexed { i, food ->
+            val newFoods = it.day.foods.mapIndexed { i, food ->
                 if (i == iFood) food.copy(calories = value) else food
             }
 
-            it.copy(task = it.task.copy(foods = newFoods))
+            it.copy(day = it.day.copy(foods = newFoods))
         }
     }
 
@@ -153,11 +153,11 @@ class AddEditTaskViewModel @Inject constructor(
         newProtein.toIntOrNull().let {it -> if(it != null && it < 100) value = it}
 
         _uiState.update {
-            val newFoods = it.task.foods.mapIndexed { i, food ->
+            val newFoods = it.day.foods.mapIndexed { i, food ->
                 if (i == iFood) food.copy(protein = value) else food
             }
 
-            it.copy(task = it.task.copy(foods = newFoods))
+            it.copy(day = it.day.copy(foods = newFoods))
         }
     }
 
@@ -165,44 +165,44 @@ class AddEditTaskViewModel @Inject constructor(
         var value = 0
         newCardio.toIntOrNull().let { if(it != null && it < 3000) value = it}
         _uiState.update {
-            it.copy(task = it.task.copy(calCardio = value))
+            it.copy(day = it.day.copy(calCardio = value))
         }
     }
 
-    private fun createNewTask() = viewModelScope.launch {
-        taskRepository.createTask(uiState.value.task.title, uiState.value.task.description)
+    private fun createNewDay() = viewModelScope.launch {
+        dayRepository.createDay(uiState.value.day.title, uiState.value.day.description)
         _uiState.update {
-            it.copy(isTaskSaved = true)
+            it.copy(isDaySaved = true)
         }
     }
 
-    private fun updateTask() {
-        if (taskId == null) {
-            throw RuntimeException("updateTask() was called but task is new.")
+    private fun updateDay() {
+        if (dayId == null) {
+            throw RuntimeException("updateDay() was called but day is new.")
         }
         viewModelScope.launch {
-            taskRepository.updateTask(
-                taskId = uiState.value.task.id,
-                title = uiState.value.task.title,
-                description = uiState.value.task.description,
-                foods = uiState.value.task.foods,
-                cardio = uiState.value.task.calCardio
+            dayRepository.updateDay(
+                dayId = uiState.value.day.id,
+                title = uiState.value.day.title,
+                description = uiState.value.day.description,
+                foods = uiState.value.day.foods,
+                cardio = uiState.value.day.calCardio
             )
             _uiState.update {
-                it.copy(isTaskSaved = true)
+                it.copy(isDaySaved = true)
             }
         }
     }
 
-    private fun loadTask(taskId: String) {
+    private fun loadDay(dayId: String) {
         _uiState.update {
             it.copy(isLoading = true)
         }
         viewModelScope.launch {
-            taskRepository.getTask(taskId).let { task ->
-                if (task != null) {
+            dayRepository.getDay(dayId).let { day ->
+                if (day != null) {
                     _uiState.update {
-                        it.copy(task = task,
+                        it.copy(day = day,
                             isLoading = false
                         )
                     }

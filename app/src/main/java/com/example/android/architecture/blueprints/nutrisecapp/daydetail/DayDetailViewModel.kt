@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.nutrisecapp.taskdetail
+package com.example.android.architecture.blueprints.nutrisecapp.daydetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.nutrisecapp.R
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinationsArgs
-import com.example.android.architecture.blueprints.nutrisecapp.data.Task
-import com.example.android.architecture.blueprints.nutrisecapp.data.TaskRepository
+import com.example.android.architecture.blueprints.nutrisecapp.data.Day
+import com.example.android.architecture.blueprints.nutrisecapp.data.DayRepository
 import com.example.android.architecture.blueprints.nutrisecapp.util.Async
 import com.example.android.architecture.blueprints.nutrisecapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,50 +38,50 @@ import javax.inject.Inject
 /**
  * UiState for the Details screen.
  */
-data class TaskDetailUiState(
-    val task: Task? = null,
+data class DayDetailUiState(
+    val day: Day? = null,
     val isLoading: Boolean = false,
     val userMessage: Int? = null,
-    val isTaskDeleted: Boolean = false
+    val isDayDeleted: Boolean = false
 )
 
 /**
  * ViewModel for the Details screen.
  */
 @HiltViewModel
-class TaskDetailViewModel @Inject constructor(
-    private val taskRepository: TaskRepository,
+class DayDetailViewModel @Inject constructor(
+    private val dayRepository: DayRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val taskId: String = savedStateHandle[NutriSecDestinationsArgs.TASK_ID_ARG]!!
+    val dayId: String = savedStateHandle[NutriSecDestinationsArgs.DAY_ID_ARG]!!
 
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
-    private val _isTaskDeleted = MutableStateFlow(false)
-    private val _taskAsync = taskRepository.getTaskStream(taskId)
-        .map { handleTask(it) }
-        .catch { emit(Async.Error(R.string.loading_task_error)) }
+    private val _isDayDeleted = MutableStateFlow(false)
+    private val _dayAsync = dayRepository.getDayStream(dayId)
+        .map { handleDay(it) }
+        .catch { emit(Async.Error(R.string.loading_day_error)) }
 
-    val uiState: StateFlow<TaskDetailUiState> = combine(
-        _userMessage, _isLoading, _isTaskDeleted, _taskAsync
-    ) { userMessage, isLoading, isTaskDeleted, taskAsync ->
-        when (taskAsync) {
+    val uiState: StateFlow<DayDetailUiState> = combine(
+        _userMessage, _isLoading, _isDayDeleted, _dayAsync
+    ) { userMessage, isLoading, isDayDeleted, dayAsync ->
+        when (dayAsync) {
             Async.Loading -> {
-                TaskDetailUiState(isLoading = true)
+                DayDetailUiState(isLoading = true)
             }
             is Async.Error -> {
-                TaskDetailUiState(
-                    userMessage = taskAsync.errorMessage,
-                    isTaskDeleted = isTaskDeleted
+                DayDetailUiState(
+                    userMessage = dayAsync.errorMessage,
+                    isDayDeleted = isDayDeleted
                 )
             }
             is Async.Success -> {
-                TaskDetailUiState(
-                    task = taskAsync.data,
+                DayDetailUiState(
+                    day = dayAsync.data,
                     isLoading = isLoading,
                     userMessage = userMessage,
-                    isTaskDeleted = isTaskDeleted
+                    isDayDeleted = isDayDeleted
                 )
             }
         }
@@ -89,29 +89,29 @@ class TaskDetailViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = WhileUiSubscribed,
-            initialValue = TaskDetailUiState(isLoading = true)
+            initialValue = DayDetailUiState(isLoading = true)
         )
 
-    fun deleteTask() = viewModelScope.launch {
-        taskRepository.deleteTask(taskId)
-        _isTaskDeleted.value = true
+    fun deleteDay() = viewModelScope.launch {
+        dayRepository.deleteDay(dayId)
+        _isDayDeleted.value = true
     }
 
     fun setCompleted(completed: Boolean) = viewModelScope.launch {
-        val task = uiState.value.task ?: return@launch
+        val day = uiState.value.day ?: return@launch
         if (completed) {
-            taskRepository.completeTask(task.id)
-            showSnackbarMessage(R.string.task_marked_complete)
+            dayRepository.completeDay(day.id)
+            showSnackbarMessage(R.string.day_marked_complete)
         } else {
-            taskRepository.activateTask(task.id)
-            showSnackbarMessage(R.string.task_marked_active)
+            dayRepository.activateDay(day.id)
+            showSnackbarMessage(R.string.day_marked_active)
         }
     }
 
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
-            taskRepository.refreshTask(taskId)
+            dayRepository.refreshDay(dayId)
             _isLoading.value = false
         }
     }
@@ -124,10 +124,10 @@ class TaskDetailViewModel @Inject constructor(
         _userMessage.value = message
     }
 
-    private fun handleTask(task: Task?): Async<Task?> {
-        if (task == null) {
-            return Async.Error(R.string.task_not_found)
+    private fun handleDay(day: Day?): Async<Day?> {
+        if (day == null) {
+            return Async.Error(R.string.day_not_found)
         }
-        return Async.Success(task)
+        return Async.Success(day)
     }
 }

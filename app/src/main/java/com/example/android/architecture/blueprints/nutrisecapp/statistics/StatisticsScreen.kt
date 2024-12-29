@@ -57,8 +57,8 @@ fun StatisticsScreen(
         StatisticsContent(
             loading = uiState.isLoading,
             empty = uiState.isEmpty,
-            activeTasksPercent = uiState.activeTasksPercent,
-            completedTasksPercent = uiState.completedTasksPercent,
+            activeDaysPercent = uiState.activeDaysPercent,
+            completedDaysPercent = uiState.completedDaysPercent,
             onRefresh = { viewModel.refresh() },
             modifier = modifier.padding(paddingValues)
         )
@@ -69,8 +69,8 @@ fun StatisticsScreen(
 private fun StatisticsContent(
     loading: Boolean,
     empty: Boolean,
-    activeTasksPercent: Float,
-    completedTasksPercent: Float,
+    activeDaysPercent: Float,
+    completedDaysPercent: Float,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -85,7 +85,7 @@ private fun StatisticsContent(
         modifier = modifier,
         emptyContent = {
             Text(
-                text = stringResource(id = R.string.statistics_no_tasks),
+                text = stringResource(id = R.string.statistics_no_days),
                 modifier = commonModifier
             )
         }
@@ -96,11 +96,11 @@ private fun StatisticsContent(
                 .verticalScroll(rememberScrollState())
         ) {
             if (!loading) {
-                Text(stringResource(id = R.string.statistics_active_tasks, activeTasksPercent))
+                Text(stringResource(id = R.string.statistics_active_days, activeDaysPercent))
                 Text(
                     stringResource(
-                        id = R.string.statistics_completed_tasks,
-                        completedTasksPercent
+                        id = R.string.statistics_completed_days,
+                        completedDaysPercent
                     )
                 )
             }
@@ -115,8 +115,8 @@ fun StatisticsContentPreview() {
         StatisticsContent(
             loading = false,
             empty = false,
-            activeTasksPercent = 80f,
-            completedTasksPercent = 20f,
+            activeDaysPercent = 80f,
+            completedDaysPercent = 20f,
             onRefresh = { }
         )
     }

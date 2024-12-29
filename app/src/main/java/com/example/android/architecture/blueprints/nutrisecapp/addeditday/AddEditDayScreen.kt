@@ -16,7 +16,7 @@
 
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.android.architecture.blueprints.nutrisecapp.addedittask
+package com.example.android.architecture.blueprints.nutrisecapp.addeditday
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
@@ -78,34 +79,30 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.nutrisecapp.R
 import com.example.android.architecture.blueprints.nutrisecapp.data.Food
-import com.example.android.architecture.blueprints.nutrisecapp.data.Task
-import com.example.android.architecture.blueprints.nutrisecapp.util.AddEditTaskTopAppBar
+import com.example.android.architecture.blueprints.nutrisecapp.data.Day
+import com.example.android.architecture.blueprints.nutrisecapp.util.AddEditDayTopAppBar
 import com.example.android.architecture.blueprints.nutrisecapp.util.primaryDarkColor
 
 @Composable
-fun AddEditTaskScreen(
+fun AddEditDayScreen(
     @StringRes topBarTitle: Int,
-    onTaskUpdate: () -> Unit,
+    onDayUpdate: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AddEditTaskViewModel = hiltViewModel(),
+    viewModel: AddEditDayViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { AddEditTaskTopAppBar(topBarTitle, {onBack()}) },
-        floatingActionButton = {
-            SmallFloatingActionButton(onClick = viewModel::saveTask) {
-                Icon(Icons.Filled.Done, stringResource(id = R.string.cd_save_task))
-            }
-        }
+        topBar = { AddEditDayTopAppBar(topBarTitle, {onBack()}) },
+        floatingActionButton = { }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        AddEditTaskContent(
+        AddEditDayContent(
             loading = uiState.isLoading,
-            task = uiState.task,
+            day = uiState.day,
             onTitleChanged = viewModel::updateTitle,
             onDescriptionChanged = viewModel::updateDescription,
             onCardioChanged = viewModel::updateCardio,
@@ -115,13 +112,14 @@ fun AddEditTaskScreen(
             onFoodProteinChanged = viewModel::updateFoodIProtein,
             onAddFood = viewModel::addFood,
             onRemoveFoodI = viewModel::removeFoodI,
+            onSaveDay = viewModel::saveDay,
             modifier = Modifier.padding(paddingValues)
         )
 
-        // Check if the task is saved and call onTaskUpdate event
-        LaunchedEffect(uiState.isTaskSaved) {
-            if (uiState.isTaskSaved) {
-                onTaskUpdate()
+        // Check if the day is saved and call onDayUpdate event
+        LaunchedEffect(uiState.isDaySaved) {
+            if (uiState.isDaySaved) {
+                onDayUpdate()
             }
         }
 
@@ -137,11 +135,12 @@ fun AddEditTaskScreen(
 }
 
 @Composable
-private fun AddEditTaskContent(
+private fun AddEditDayContent(
     loading: Boolean,
-    task: Task,
+    day: Day,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
+    onSaveDay: () -> Unit,
     onCardioChanged: (String) -> Unit,
     onAddFood: () -> Unit,
     onFoodNameChanged: (Int, String) -> Unit,
@@ -169,7 +168,7 @@ private fun AddEditTaskContent(
         ) {
             item {
                 OutlinedTextField(
-                    value = task.title,
+                    value = day.title,
                     modifier = Modifier.fillMaxWidth(),
                     onValueChange = onTitleChanged,
                     placeholder = {
@@ -186,7 +185,7 @@ private fun AddEditTaskContent(
             }
 
 
-            itemsIndexed(task.foods) { i, food ->
+            itemsIndexed(day.foods) { i, food ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
@@ -234,7 +233,7 @@ private fun AddEditTaskContent(
             }
         }
         OutlinedTextField(
-            value = task.calCardio.let { if (it == 0) "" else it.toString() },
+            value = day.calCardio.let { if (it == 0) "" else it.toString() },
             onValueChange = onCardioChanged,
             modifier = Modifier.fillMaxWidth(),
             colors = numberEditableColors,
@@ -248,22 +247,23 @@ private fun AddEditTaskContent(
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround){
             Text("Total")
-            Text(task.foods.sumOf { it.quantity }.toString())
-            Text(task.getCalDay.toString())
-            Text(task.foods.sumOf { it.protein  }.toString())
-            Icon(if (task.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
+            Text(day.foods.sumOf { it.quantity }.toString())
+            Text(day.getCalDay.toString())
+            Text(day.foods.sumOf { it.protein  }.toString())
+            Icon(if (day.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
         }
+            Button(onClick = onSaveDay, modifier = modifier.fillMaxWidth()){ Icon(imageVector = Icons.Filled.Done, contentDescription = "Finish",  tint = { Color.White }())}
     }
 
 }
 
 @Preview
 @Composable
-private fun AddEditTaskScreenPreview() {
+private fun AddEditDayScreenPreview() {
     Surface {
-        AddEditTaskContent(
+        AddEditDayContent(
             loading = false,
-            task = Task(
+            day = Day(
                 title = "Title",
                 description = "Description",
                 isCompleted = false,
@@ -280,6 +280,7 @@ private fun AddEditTaskScreenPreview() {
             onFoodProteinChanged = {_, _ -> Unit },
             onAddFood = {},
             onRemoveFoodI = {},
+            onSaveDay = {},
             modifier = Modifier
         )
     }
@@ -287,11 +288,11 @@ private fun AddEditTaskScreenPreview() {
 
 @Preview
 @Composable
-private fun FullAddEditTaskScreenPreview() {
+private fun FullAddEditDayScreenPreview() {
     Surface {
-        AddEditTaskContent(
+        AddEditDayContent(
             loading = false,
-            task = Task(
+            day = Day(
                 title = "Title",
                 description = "Description",
                 isCompleted = false,
@@ -321,6 +322,7 @@ private fun FullAddEditTaskScreenPreview() {
             onFoodProteinChanged = {_, _ -> Unit },
             onAddFood = {},
             onRemoveFoodI = {},
+            onSaveDay = {},
             modifier = Modifier
         )
     }

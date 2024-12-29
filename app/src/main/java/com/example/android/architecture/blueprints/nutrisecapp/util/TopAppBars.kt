@@ -51,12 +51,12 @@ import com.example.android.architecture.blueprints.nutrisecapp.R
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecTheme
 
 @Composable
-fun TasksTopAppBar(
+fun DaysTopAppBar(
     openDrawer: () -> Unit,
-    onFilterAllTasks: () -> Unit,
-    onFilterActiveTasks: () -> Unit,
-    onFilterCompletedTasks: () -> Unit,
-    onClearCompletedTasks: () -> Unit,
+    onFilterAllDays: () -> Unit,
+    onFilterActiveDays: () -> Unit,
+    onFilterCompletedDays: () -> Unit,
+    onClearCompletedDays: () -> Unit,
     onRefresh: () -> Unit
 ) {
     TopAppBar(
@@ -67,18 +67,18 @@ fun TasksTopAppBar(
             }
         },
         actions = {
-            FilterTasksMenu(onFilterAllTasks, onFilterActiveTasks, onFilterCompletedTasks)
-            MoreTasksMenu(onClearCompletedTasks, onRefresh)
+            FilterDaysMenu(onFilterAllDays, onFilterActiveDays, onFilterCompletedDays)
+            MoreDaysMenu(onClearCompletedDays, onRefresh)
         },
         modifier = Modifier.fillMaxWidth()
     )
 }
 
 @Composable
-private fun FilterTasksMenu(
-    onFilterAllTasks: () -> Unit,
-    onFilterActiveTasks: () -> Unit,
-    onFilterCompletedTasks: () -> Unit
+private fun FilterDaysMenu(
+    onFilterAllDays: () -> Unit,
+    onFilterActiveDays: () -> Unit,
+    onFilterCompletedDays: () -> Unit
 ) {
     TopAppBarDropdownMenu(
         iconContent = {
@@ -88,21 +88,21 @@ private fun FilterTasksMenu(
             )
         }
     ) { closeMenu ->
-        DropdownMenuItem(onClick = { onFilterAllTasks(); closeMenu() },
+        DropdownMenuItem(onClick = { onFilterAllDays(); closeMenu() },
             text = { Text(text = stringResource(id = R.string.nav_all)) }
         )
-        DropdownMenuItem(onClick = { onFilterActiveTasks(); closeMenu() },
+        DropdownMenuItem(onClick = { onFilterActiveDays(); closeMenu() },
             text = { Text(text = stringResource(id = R.string.nav_active)) }
         )
-        DropdownMenuItem(onClick = { onFilterCompletedTasks(); closeMenu() },
+        DropdownMenuItem(onClick = { onFilterCompletedDays(); closeMenu() },
             text = { Text(text = stringResource(id = R.string.nav_completed)) }
         )
     }
 }
 
 @Composable
-private fun MoreTasksMenu(
-    onClearCompletedTasks: () -> Unit,
+private fun MoreDaysMenu(
+    onClearCompletedDays: () -> Unit,
     onRefresh: () -> Unit
 ) {
     TopAppBarDropdownMenu(
@@ -112,7 +112,7 @@ private fun MoreTasksMenu(
     ) { closeMenu ->
         DropdownMenuItem(
             text = { Text(text = stringResource(id = R.string.menu_clear)) },
-            onClick = { onClearCompletedTasks(); closeMenu() }
+            onClick = { onClearCompletedDays(); closeMenu() }
         )
         DropdownMenuItem(
             text = { Text(text = stringResource(id = R.string.refresh)) },
@@ -156,10 +156,10 @@ fun StatisticsTopAppBar(openDrawer: () -> Unit) {
 }
 
 @Composable
-fun TaskDetailTopAppBar(onBack: () -> Unit, onDelete: () -> Unit) {
+fun DayDetailTopAppBar(onBack: () -> Unit, onDelete: () -> Unit) {
     TopAppBar(
         title = {
-            Text(text = stringResource(id = R.string.task_details))
+            Text(text = stringResource(id = R.string.day_details))
         },
         navigationIcon = {
             IconButton(onClick = onBack) {
@@ -168,7 +168,7 @@ fun TaskDetailTopAppBar(onBack: () -> Unit, onDelete: () -> Unit) {
         },
         actions = {
             IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, stringResource(id = R.string.menu_delete_task))
+                Icon(Icons.Filled.Delete, stringResource(id = R.string.menu_delete_day))
             }
         },
         modifier = Modifier.fillMaxWidth()
@@ -176,7 +176,7 @@ fun TaskDetailTopAppBar(onBack: () -> Unit, onDelete: () -> Unit) {
 }
 
 @Composable
-fun AddEditTaskTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
+fun AddEditDayTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(title)) },
         navigationIcon = {
@@ -190,10 +190,10 @@ fun AddEditTaskTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
 
 @Preview
 @Composable
-private fun TasksTopAppBarPreview() {
+private fun DaysTopAppBarPreview() {
     NutriSecTheme {
         Surface {
-            TasksTopAppBar({}, {}, {}, {}, {}, {})
+            DaysTopAppBar({}, {}, {}, {}, {}, {})
         }
     }
 }
@@ -210,20 +210,20 @@ private fun StatisticsTopAppBarPreview() {
 
 @Preview
 @Composable
-private fun TaskDetailTopAppBarPreview() {
+private fun DayDetailTopAppBarPreview() {
     NutriSecTheme {
         Surface {
-            TaskDetailTopAppBar({ }, { })
+            DayDetailTopAppBar({ }, { })
         }
     }
 }
 
 @Preview
 @Composable
-private fun AddEditTaskTopAppBarPreview() {
+private fun AddEditDayTopAppBarPreview() {
     NutriSecTheme {
         Surface {
-            AddEditTaskTopAppBar(R.string.add_task) { }
+            AddEditDayTopAppBar(R.string.add_day) { }
         }
     }
 }

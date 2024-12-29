@@ -18,9 +18,10 @@ package com.example.android.architecture.blueprints.nutrisecapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.android.architecture.blueprints.nutrisecapp.data.DefaultTaskRepository
-import com.example.android.architecture.blueprints.nutrisecapp.data.TaskRepository
-import com.example.android.architecture.blueprints.nutrisecapp.data.TaskDao
+import com.example.android.architecture.blueprints.nutrisecapp.data.DefaultDayRepository
+import com.example.android.architecture.blueprints.nutrisecapp.data.MIGRATION_2_3
+import com.example.android.architecture.blueprints.nutrisecapp.data.DayRepository
+import com.example.android.architecture.blueprints.nutrisecapp.data.DayDao
 import com.example.android.architecture.blueprints.nutrisecapp.data.NutriSecDatabase
 import dagger.Binds
 import dagger.Module
@@ -36,7 +37,7 @@ abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun bindTaskRepository(repository: DefaultTaskRepository): TaskRepository
+    abstract fun bindDayRepository(repository: DefaultDayRepository): DayRepository
 }
 
 @Module
@@ -55,10 +56,10 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context.applicationContext,
             NutriSecDatabase::class.java,
-            "Tasks.db"
-        ).fallbackToDestructiveMigration().build()
+            "Days.db"
+        ).addMigrations(MIGRATION_2_3).build()
     }
 
     @Provides
-    fun provideTaskDao(database: NutriSecDatabase): TaskDao = database.taskDao()
+    fun provideDayDao(database: NutriSecDatabase): DayDao = database.dayDao()
 }

@@ -50,24 +50,25 @@ class FoodConverter {
 
 
 /**
- * Immutable model class for a Task.
+ * Immutable model class for a Day.
  *
- * @param title title of the task
- * @param description description of the task
- * @param isCompleted whether or not this task is completed
- * @param id id of the task
+ * @param title title of the day
+ * @param description description of the day
+ * @param isCompleted whether or not this day is completed
+ * @param id id of the day
  *
  * NutriSec: The constructor of this class should be `internal` but it is used in previews and tests
  *  so that's not possible until those previews/tests are refactored.
  */
 @Entity(
-    tableName = "task"
+    tableName = "Days"
 )
-data class Task(
+data class Day(
     val title: String = Calendar.getInstance().let { it.get(Calendar.DAY_OF_MONTH).toString() + "/" + it.get(Calendar.MONTH).toString() +"/"+ it.get(Calendar.YEAR).toString()},
     val description: String = "",
     val isCompleted: Boolean = false,
     val calCardio: Int = 0,
+    val weight: Double = 0.0,
     @PrimaryKey val id: String,
     @TypeConverters(FoodConverter::class) var foods: List<Food> = emptyList()
 ) {
@@ -77,9 +78,6 @@ data class Task(
 
     val isActive
         get() = !isCompleted
-
-    val isEmpty
-        get() = title.isEmpty() || description.isEmpty()
 
     val getCalDay: Int
         get() = foods.sumOf { it.calories } - calCardio

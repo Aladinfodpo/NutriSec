@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.nutrisecapp.tasks
+package com.example.android.architecture.blueprints.nutrisecapp.days
 
 /**
- * Used with the filter spinner in the tasks list.
+ * Used with the filter spinner in the days list.
  */
-enum class TasksFilterType {
+enum class DaysFilterType {
     /**
-     * Do not filter tasks.
+     * Do not filter days.
      */
-    ALL_TASKS,
+    ALL_DAYS,
 
     /**
-     * Filters only the active (not completed yet) tasks.
+     * Filters only the active (not completed yet) days.
      */
-    ACTIVE_TASKS,
+    ACTIVE_DAYS,
 
     /**
-     * Filters only the completed tasks.
+     * Filters only the completed days.
      */
-    COMPLETED_TASKS
+    COMPLETED_DAYS
 }
