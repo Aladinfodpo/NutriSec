@@ -172,14 +172,18 @@ class AddEditDayViewModel @Inject constructor(
 
     fun updateWeight(newWeight: String) {
         var value = 0.0
-        newWeight.toDoubleOrNull().let { if(it != null && it < 300.0) value = it}
+        newWeight.toDoubleOrNull().let { if(it != null) value = it}
         _uiState.update {
             it.copy(day = it.day.copy(weight = value))
         }
     }
 
     private fun createNewDay() = viewModelScope.launch {
-        dayRepository.createDay(uiState.value.day.title, uiState.value.day.description)
+        dayRepository.createDay( title = uiState.value.day.title,
+                                description = uiState.value.day.description,
+                                foods = uiState.value.day.foods,
+                                cardio = uiState.value.day.calCardio,
+                                weight = uiState.value.day.weight)
         _uiState.update {
             it.copy(isDaySaved = true)
         }
@@ -195,7 +199,8 @@ class AddEditDayViewModel @Inject constructor(
                 title = uiState.value.day.title,
                 description = uiState.value.day.description,
                 foods = uiState.value.day.foods,
-                cardio = uiState.value.day.calCardio
+                cardio = uiState.value.day.calCardio,
+                weight = uiState.value.day.weight
             )
             _uiState.update {
                 it.copy(isDaySaved = true)

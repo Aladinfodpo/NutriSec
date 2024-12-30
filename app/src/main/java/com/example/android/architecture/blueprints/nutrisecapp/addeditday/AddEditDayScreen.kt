@@ -254,10 +254,12 @@ private fun AddEditDayContent(
             Text(day.foods.sumOf { it.protein  }.toString())
             Icon(if (day.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
         }
-
+        var weight by remember { mutableStateOf("Loading") }
+        if(!loading && weight == "Loading" )
+            weight = day.weight.toString()
         OutlinedTextField(
-            value = day.weight.toString(),
-            onValueChange = onWeightChanged,
+            value = weight,
+            onValueChange = {it -> onWeightChanged(it); weight = it},
             modifier = Modifier.fillMaxWidth(),
             colors = numberEditableColors,
             maxLines = 1,

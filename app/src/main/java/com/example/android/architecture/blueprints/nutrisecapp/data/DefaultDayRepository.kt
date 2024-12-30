@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.nutrisecapp.data
 
+import androidx.compose.ui.text.font.FontWeight
 import com.example.android.architecture.blueprints.nutrisecapp.di.ApplicationScope
 import com.example.android.architecture.blueprints.nutrisecapp.di.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
@@ -43,7 +44,7 @@ class DefaultDayRepository @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,
 ) : DayRepository {
 
-    override suspend fun createDay(title: String, description: String): String {
+    override suspend fun createDay(title: String, description: String, foods: List<Food>, cardio: Int, weight: Double): String {
         // ID creation might be a complex operation so it's executed using the supplied
         // coroutine dispatcher
         val dayId = withContext(dispatcher) {
@@ -53,17 +54,21 @@ class DefaultDayRepository @Inject constructor(
             title = title,
             description = description,
             id = dayId,
+            foods = foods,
+            calCardio = cardio,
+            weight = weight
         )
         localDataSource.upsert(day)
         return dayId
     }
 
-    override suspend fun updateDay(dayId: String, title: String, description: String, foods: List<Food>, cardio: Int) {
+    override suspend fun updateDay(dayId: String, title: String, description: String, foods: List<Food>, cardio: Int, weight: Double) {
         val day = getDay(dayId)?.copy(
             title = title,
             description = description,
             foods = foods,
-            calCardio = cardio
+            calCardio = cardio,
+            weight = weight
         ) ?: throw Exception("Day (id $dayId) not found")
 
         localDataSource.upsert(day)

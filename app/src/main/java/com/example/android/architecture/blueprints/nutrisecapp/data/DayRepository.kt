@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.nutrisecapp.data
 
+import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -33,9 +34,9 @@ interface DayRepository {
 
     suspend fun refreshDay(dayId: String)
 
-    suspend fun createDay(title: String, description: String): String
+    suspend fun createDay(title: String, description: String, foods: List<Food>, cardio: Int, weight: Double): String
 
-    suspend fun updateDay(dayId: String, title: String, description: String, foods: List<Food>, cardio: Int)
+    suspend fun updateDay(dayId: String, title: String, description: String, foods: List<Food>, cardio: Int, weight: Double)
 
     suspend fun completeDay(dayId: String)
 

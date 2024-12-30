@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.nutrisecapp.daydetail
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -155,6 +156,10 @@ private fun EditDayContent(
                         Text(day.foods.sumOf { it.protein  }.toString())
                         Icon(if (day.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
                     }
+                }
+                item{
+                    Spacer(Modifier.height(150.dp))
+                    Text("Poids : " +day.weight.toString()+" kg")
                 }
             }
 
