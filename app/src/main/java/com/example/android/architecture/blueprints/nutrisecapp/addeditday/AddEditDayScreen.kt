@@ -19,12 +19,16 @@
 package com.example.android.architecture.blueprints.nutrisecapp.addeditday
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -43,6 +47,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
@@ -82,6 +87,8 @@ import com.example.android.architecture.blueprints.nutrisecapp.data.Food
 import com.example.android.architecture.blueprints.nutrisecapp.data.Day
 import com.example.android.architecture.blueprints.nutrisecapp.util.AddEditDayTopAppBar
 import com.example.android.architecture.blueprints.nutrisecapp.util.primaryDarkColor
+
+import com.example.android.architecture.blueprints.nutrisecapp.util.CalculatorContent
 
 @Composable
 fun AddEditDayScreen(
@@ -164,113 +171,136 @@ private fun AddEditDayContent(
             unfocusedBorderColor = primaryDarkColor,
             cursorColor = Color.Black
         )
-        Column(){
-        LazyColumn(
-            modifier = modifier.fillMaxWidth().weight(1.0F).padding(8.dp)
-        ) {
-            item {
-                OutlinedTextField(
-                    value = day.title,
-                    modifier = Modifier.fillMaxWidth(),
-                    onValueChange = onTitleChanged,
-                    placeholder = {
-                        Text(
-                            text = stringResource(id = R.string.title_hint),
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    },
-                    textStyle = MaterialTheme.typography.headlineSmall
-                        .copy(fontWeight = FontWeight.Bold),
-                    maxLines = 1,
-                    colors = textFieldColors
-                )
-            }
-
-
-            itemsIndexed(day.foods) { i, food ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
+        Column(modifier = Modifier.imePadding())
+        {
+            Box(modifier = modifier.fillMaxWidth().padding(4.dp).weight(1.0F).border(4.dp, primaryDarkColor, shape = RoundedCornerShape(12.dp))) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth().padding(4.dp),
                 ) {
-                    OutlinedTextField(
-                        value = food.name,
-                        onValueChange = { newValue -> onFoodNameChanged(i, newValue) },
-                        placeholder = { Text("Whey") },
-                        modifier = Modifier.weight(1.0F).padding(),
-                        colors = textFieldColors,
-                        maxLines = 1,
-                    )
-                    TextField(
-                        value = food.quantity.let { if (it == 0) "" else it.toString() },
-                        onValueChange = { newValue -> onFoodQuantityChanged(i, newValue) },
-                        modifier = Modifier.widthIn(1.dp, 80.dp),
-                        colors = textFieldColors,
-                        maxLines = 1,
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    )
-                    TextField(
-                        value = food.calories.let { if (it == 0) "" else it.toString() },
-                        onValueChange = { newValue -> onFoodCalorieChanged(i, newValue) },
-                        modifier = Modifier.widthIn(1.dp, 80.dp),
-                        colors = textFieldColors,
-                        maxLines = 1,
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    )
-                    TextField(
-                        value = food.protein.let { if (it == 0) "" else it.toString() },
-                        onValueChange = { newValue -> onFoodProteinChanged(i, newValue) },
-                        modifier = Modifier.widthIn(1.dp, 80.dp),
-                        colors = textFieldColors,
-                        maxLines = 1,
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    )
-                    ElevatedButton(onClick = {onRemoveFoodI(i)}, modifier = Modifier.weight(1.0F)) { Icon(Icons.Filled.Delete, "Delete")}
+                    item {
+                        OutlinedTextField(
+                            value = day.title,
+                            modifier = Modifier.fillMaxWidth(),
+                            onValueChange = onTitleChanged,
+                            placeholder = {
+                                Text(
+                                    text = stringResource(id = R.string.title_hint),
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            },
+                            textStyle = MaterialTheme.typography.headlineSmall
+                                .copy(fontWeight = FontWeight.Bold),
+                            maxLines = 1,
+                            colors = textFieldColors
+                        )
+                    }
+
+
+                    itemsIndexed(day.foods) { i, food ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                value = food.name,
+                                onValueChange = { newValue -> onFoodNameChanged(i, newValue) },
+                                placeholder = { Text("Whey") },
+                                modifier = Modifier.weight(1.0F).padding(),
+                                colors = textFieldColors,
+                                maxLines = 1,
+                            )
+                            TextField(
+                                value = food.quantity.let { if (it == 0) "" else it.toString() },
+                                onValueChange = { newValue -> onFoodQuantityChanged(i, newValue) },
+                                modifier = Modifier.widthIn(1.dp, 80.dp),
+                                colors = textFieldColors,
+                                maxLines = 1,
+                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                            )
+                            TextField(
+                                value = food.calories.let { if (it == 0) "" else it.toString() },
+                                onValueChange = { newValue -> onFoodCalorieChanged(i, newValue) },
+                                modifier = Modifier.widthIn(1.dp, 80.dp),
+                                colors = textFieldColors,
+                                maxLines = 1,
+                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                            )
+                            TextField(
+                                value = food.protein.let { if (it == 0) "" else it.toString() },
+                                onValueChange = { newValue -> onFoodProteinChanged(i, newValue) },
+                                modifier = Modifier.widthIn(1.dp, 80.dp),
+                                colors = textFieldColors,
+                                maxLines = 1,
+                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                            )
+                            ElevatedButton(
+                                onClick = { onRemoveFoodI(i) },
+                                modifier = Modifier.weight(1.0F)
+                            ) { Icon(Icons.Filled.Delete, "Delete") }
+                        }
+                    }
+                    item {
+                        ElevatedButton(
+                            onClick = onAddFood,
+                            modifier = modifier.fillMaxWidth()
+                        ) { Text("Add food") }
+                    }
                 }
             }
-            item{
-                ElevatedButton(onClick = onAddFood, modifier = modifier.fillMaxWidth()){ Text("Add food")}
+            OutlinedTextField(
+                value = day.calCardio.let { if (it == 0) "" else it.toString() },
+                onValueChange = onCardioChanged,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                colors = numberEditableColors,
+                maxLines = 1,
+                shape = RoundedCornerShape(12.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                label = { Text("Cardio") },
+                suffix = { Text("kcal") }
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text("Total")
+                Text(day.foods.sumOf { it.quantity }.toString())
+                Text(day.getCalDay.toString())
+                Text(day.foods.sumOf { it.protein  }.toString())
+                Icon(if (day.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done", tint = if (day.isBad) Color.Red else primaryDarkColor)
             }
-        }
-        OutlinedTextField(
-            value = day.calCardio.let { if (it == 0) "" else it.toString() },
-            onValueChange = onCardioChanged,
-            modifier = Modifier.fillMaxWidth(),
-            colors = numberEditableColors,
-            maxLines = 1,
-            shape = RoundedCornerShape(12.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            label = { Text("Cardio") },
-            suffix = { Text("kcal") }
-        )
 
-        Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround){
-            Text("Total")
-            Text(day.foods.sumOf { it.quantity }.toString())
-            Text(day.getCalDay.toString())
-            Text(day.foods.sumOf { it.protein  }.toString())
-            Icon(if (day.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
-        }
-        var weight by remember { mutableStateOf("Loading") }
-        if(!loading && weight == "Loading" )
-            weight = day.weight.toString()
-        OutlinedTextField(
-            value = weight,
-            onValueChange = {it -> onWeightChanged(it); weight = it},
-            modifier = Modifier.fillMaxWidth(),
-            colors = numberEditableColors,
-            maxLines = 1,
-            shape = RoundedCornerShape(12.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            label = { Text("Poids (couché)") },
-            suffix = { Text("kg") }
-        )
+            var weight by remember { mutableStateOf("Loading") }
+            if(!loading && weight == "Loading" )
+                weight = day.weight.toString()
 
-        Button(onClick = onSaveDay, modifier = modifier.fillMaxWidth()){ Icon(imageVector = Icons.Filled.Done, contentDescription = "Finish",  tint = { Color.White }())}
-    }
+            OutlinedTextField(
+                value = weight,
+                onValueChange = {it -> onWeightChanged(it); weight = it},
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                colors = numberEditableColors,
+                maxLines = 1,
+                shape = RoundedCornerShape(12.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                label = { Text("Poids (couché)") },
+                suffix = { Text("kg") }
+            )
+
+            ElevatedButton(
+                onClick = onSaveDay,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                colors = ButtonDefaults.buttonColors().copy(containerColor = primaryDarkColor)
+            ){
+                Icon(imageVector = Icons.Filled.Done, contentDescription = "Finish",  tint = Color.White)
+            }
+
+            CalculatorContent()
+        }
 
 }
 
@@ -347,3 +377,52 @@ private fun FullAddEditDayScreenPreview() {
     }
 }
 
+@Preview
+@Composable
+private fun AllPage(){
+    Surface {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            snackbarHost = {  },
+            topBar = { AddEditDayTopAppBar(0, {}) },
+            floatingActionButton = { }
+        ) { paddingValues ->
+            AddEditDayContent(
+                loading = false,
+                day = Day(
+                    title = "Title",
+                    description = "Description",
+                    isCompleted = false,
+                    calCardio = 10,
+                    id = "ID",
+                    foods = listOf(Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3),
+                        Food("Cerise",100, 200, 3))
+                ),
+                onTitleChanged = { },
+                onDescriptionChanged = { },
+                onCardioChanged = { },
+                onWeightChanged = { },
+                onFoodNameChanged = {_, _ -> Unit },
+                onFoodQuantityChanged =  {_, _ -> Unit },
+                onFoodCalorieChanged = {_, _ -> Unit },
+                onFoodProteinChanged = {_, _ -> Unit },
+                onAddFood = {},
+                onRemoveFoodI = {},
+                onSaveDay = {},
+                modifier = Modifier.padding(paddingValues)
+            )
+        }
+    }
+}

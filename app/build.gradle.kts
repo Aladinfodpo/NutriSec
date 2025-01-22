@@ -1,3 +1,5 @@
+import java.util.Properties
+
 /*
  * Copyright 2020 The Android Open Source Project
  *
@@ -24,6 +26,17 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("Release") {
+            val properties = Properties().apply {
+                load(File("signing.properties").reader())
+            }
+            storeFile = File(properties.getProperty("storeFilePath"))
+            storePassword = properties.getProperty("storePassword")
+            keyPassword = properties.getProperty("keyPassword")
+            keyAlias = properties.getProperty("keyAlias")
+        }
+    }
     namespace = "com.example.android.architecture.blueprints.nutrisecapp"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
@@ -56,6 +69,7 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             testProguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguardTest-rules.pro")
+            signingConfig = signingConfigs.getByName("Release")
         }
     }
 

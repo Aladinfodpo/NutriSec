@@ -62,7 +62,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.nutrisecapp.R
 import com.example.android.architecture.blueprints.nutrisecapp.data.Food
 import com.example.android.architecture.blueprints.nutrisecapp.data.Day
-import com.example.android.architecture.blueprints.nutrisecapp.util.LoadingContent
 import com.example.android.architecture.blueprints.nutrisecapp.util.DayDetailTopAppBar
 
 @Composable

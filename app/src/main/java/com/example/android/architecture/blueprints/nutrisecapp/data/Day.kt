@@ -33,7 +33,11 @@ data class Food(
     var name: String,
     var quantity: Int,
     var calories: Int,
-    var protein: Int
+    var protein: Int,
+    var fat: Int = 0,
+    var glucide: Int = 0,
+    var hour: Int = 0,
+    var minute: Int = 0
 )
 
 class FoodConverter {
@@ -64,7 +68,7 @@ class FoodConverter {
     tableName = "Days"
 )
 data class Day(
-    val title: String = Calendar.getInstance().let { it.get(Calendar.DAY_OF_MONTH).toString() + "/" + it.get(Calendar.MONTH).toString() +"/"+ it.get(Calendar.YEAR).toString()},
+    val title: String = Calendar.getInstance().let { it.get(Calendar.DAY_OF_MONTH).toString() + "/" + (if(it.get(Calendar.MONTH) + 1 < 10) "0" else "") + (it.get(Calendar.MONTH)+1).toString() +"/"+ it.get(Calendar.YEAR).toString()},
     val description: String = "",
     val isCompleted: Boolean = false,
     val calCardio: Int = 0,
