@@ -89,6 +89,7 @@ import com.example.android.architecture.blueprints.nutrisecapp.util.AddEditDayTo
 import com.example.android.architecture.blueprints.nutrisecapp.util.primaryDarkColor
 
 import com.example.android.architecture.blueprints.nutrisecapp.util.CalculatorContent
+import com.example.android.architecture.blueprints.nutrisecapp.util.DayItemProgressBar
 
 @Composable
 fun AddEditDayScreen(
@@ -102,7 +103,7 @@ fun AddEditDayScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { AddEditDayTopAppBar(topBarTitle, {onBack()}) },
+        topBar = { AddEditDayTopAppBar(topBarTitle) { onBack() } },
         floatingActionButton = { }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -171,9 +172,10 @@ private fun AddEditDayContent(
             unfocusedBorderColor = primaryDarkColor,
             cursorColor = Color.Black
         )
-        Column(modifier = Modifier.imePadding())
+        Column(modifier = modifier.imePadding())
         {
-            Box(modifier = modifier.fillMaxWidth().padding(4.dp).weight(1.0F).border(4.dp, primaryDarkColor, shape = RoundedCornerShape(12.dp))) {
+            DayItemProgressBar(day, emptyList(), {})
+            Box(modifier = Modifier.fillMaxWidth().padding(4.dp).weight(1.0F).border(4.dp, primaryDarkColor, shape = RoundedCornerShape(12.dp))) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().padding(4.dp),
                 ) {
@@ -315,7 +317,7 @@ private fun AddEditDayScreenPreview() {
                 description = "Description",
                 isCompleted = false,
                 calCardio = 10,
-                id = "ID",
+                id = 1,
                 foods = listOf(Food("Cerise",100, 200, 3), Food("Cerise",100, 200, 3), Food("Cerise",100, 200, 3))
             ),
             onTitleChanged = { },
@@ -345,7 +347,7 @@ private fun FullAddEditDayScreenPreview() {
                 description = "Description",
                 isCompleted = false,
                 calCardio = 10,
-                id = "ID",
+                id = 1,
                 foods = listOf(Food("Cerise",100, 200, 3),
                                Food("Cerise",100, 200, 3),
                                Food("Cerise",100, 200, 3),
@@ -394,7 +396,7 @@ private fun AllPage(){
                     description = "Description",
                     isCompleted = false,
                     calCardio = 10,
-                    id = "ID",
+                    id = 1,
                     foods = listOf(Food("Cerise",100, 200, 3),
                         Food("Cerise",100, 200, 3),
                         Food("Cerise",100, 200, 3),

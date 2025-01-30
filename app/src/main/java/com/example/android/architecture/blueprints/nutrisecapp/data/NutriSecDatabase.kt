@@ -27,7 +27,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  *
  * Note that exportSchema should be true in production databases.
  */
-@Database(entities = [Day::class], version = 3, exportSchema = false)
+@Database(entities = [Day::class], version = 4, exportSchema = false)
 @TypeConverters(FoodConverter::class)
 abstract class NutriSecDatabase : RoomDatabase() {
 

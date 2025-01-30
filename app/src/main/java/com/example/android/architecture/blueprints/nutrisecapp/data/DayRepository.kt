@@ -28,23 +28,25 @@ interface DayRepository {
 
     suspend fun getDays(): List<Day>
 
-    fun getDayStream(dayId: String): Flow<Day?>
+    fun getDayStream(dayId: Long): Flow<Day?>
 
-    suspend fun getDay(dayId: String): Day?
+    suspend fun getDay(dayId: Long): Day?
 
-    suspend fun refreshDay(dayId: String)
+    fun getLastDaysStream(n: Int) : Flow<List<Day>>
 
-    suspend fun createDay(title: String, description: String, foods: List<Food>, cardio: Int, weight: Double): String
+    suspend fun getLastDays(n: Int) : List<Day>
 
-    suspend fun updateDay(dayId: String, title: String, description: String, foods: List<Food>, cardio: Int, weight: Double)
+    suspend fun createDay(day: Day): Long
 
-    suspend fun completeDay(dayId: String)
+    suspend fun updateDay(day: Day)
 
-    suspend fun activateDay(dayId: String)
+    suspend fun completeDay(dayId: Long)
+
+    suspend fun activateDay(dayId: Long)
 
     suspend fun clearCompletedDays()
 
     suspend fun deleteAllDays()
 
-    suspend fun deleteDay(dayId: String)
+    suspend fun deleteDay(dayId: Long)
 }

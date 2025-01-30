@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.nutrisecapp.R
-import com.example.android.architecture.blueprints.nutrisecapp.util.LoadingContent
 import com.example.android.architecture.blueprints.nutrisecapp.util.StatisticsTopAppBar
 
 @Composable
@@ -89,40 +88,39 @@ private fun StatisticsContent(
         .fillMaxSize()
         .padding(all = dimensionResource(id = R.dimen.horizontal_margin))
 
-    if(empty)
+    if (empty)
         Text(
             text = stringResource(id = R.string.statistics_no_days),
             modifier = commonModifier
         )
     else
+        Column(
+            commonModifier
+                .fillMaxSize()
+        ) {
 
-    Column(
-        commonModifier
-            .fillMaxSize()
-    ) {
-
-            Text(stringResource(id = R.string.statistics_active_days, activeDaysPercent))
-            Text(
-                stringResource(
-                    id = R.string.statistics_completed_days,
-                    completedDaysPercent
-                )
-            )
-            val textMeasurer = rememberTextMeasurer()
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                weights.forEachIndexed { index, d ->
-                    drawText(textMeasurer = textMeasurer, text  = d.toString(), style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 14.sp
-                    ),
-                        topLeft = Offset(
-                            x = size.width / 10*index,
-                            y = size.height / 2
-                        )
+                Text(stringResource(id = R.string.statistics_active_days, activeDaysPercent))
+                Text(
+                    stringResource(
+                        id = R.string.statistics_completed_days,
+                        completedDaysPercent
                     )
+                )
+                val textMeasurer = rememberTextMeasurer()
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    weights.forEachIndexed { index, d ->
+                        drawText(textMeasurer = textMeasurer, text  = d.toString(), style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 14.sp
+                        ),
+                            topLeft = Offset(
+                                x = size.width / 10*index,
+                                y = size.height / 2
+                            )
+                        )
+                    }
                 }
-            }
-    }
+        }
 
 }
 

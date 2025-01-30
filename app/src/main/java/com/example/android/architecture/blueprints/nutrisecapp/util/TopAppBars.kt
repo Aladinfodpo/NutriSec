@@ -156,6 +156,20 @@ fun StatisticsTopAppBar(openDrawer: () -> Unit) {
 }
 
 @Composable
+fun CanIEatItTopAppBar(openDrawer: () -> Unit) {
+    TopAppBar(
+        title = { Text(text = "Can I eat it ?") },
+        navigationIcon = {
+            IconButton(onClick = openDrawer) {
+                Icon(Icons.Filled.Menu, stringResource(id = R.string.open_drawer))
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+
+@Composable
 fun DayDetailTopAppBar(onBack: () -> Unit, onDelete: () -> Unit) {
     TopAppBar(
         title = {
@@ -194,6 +208,16 @@ private fun DaysTopAppBarPreview() {
     NutriSecTheme {
         Surface {
             DaysTopAppBar({}, {}, {}, {}, {}, {})
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CanIEatItTopAppBarPreview() {
+    NutriSecTheme {
+        Surface {
+            CanIEatItTopAppBar { }
         }
     }
 }

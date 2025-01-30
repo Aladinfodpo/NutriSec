@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,33 +45,14 @@ class DefaultDayRepository @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,
 ) : DayRepository {
 
-    override suspend fun createDay(title: String, description: String, foods: List<Food>, cardio: Int, weight: Double): String {
-        // ID creation might be a complex operation so it's executed using the supplied
-        // coroutine dispatcher
-        val dayId = withContext(dispatcher) {
-            UUID.randomUUID().toString()
-        }
-        val day = Day(
-            title = title,
-            description = description,
-            id = dayId,
-            foods = foods,
-            calCardio = cardio,
-            weight = weight
-        )
-        localDataSource.upsert(day)
+    override suspend fun createDay(day: Day): Long {
+        val dayId = Calendar.getInstance().timeInMillis
+        localDataSource.upsert(day.copy(id = dayId))
         return dayId
     }
 
-    override suspend fun updateDay(dayId: String, title: String, description: String, foods: List<Food>, cardio: Int, weight: Double) {
-        val day = getDay(dayId)?.copy(
-            title = title,
-            description = description,
-            foods = foods,
-            calCardio = cardio,
-            weight = weight
-        ) ?: throw Exception("Day (id $dayId) not found")
-
+    override suspend fun updateDay(day: Day) {
+        getDay(dayId = day.id) ?: throw Exception("Day (id $day.id) not found")
         localDataSource.upsert(day)
     }
 
@@ -78,14 +60,19 @@ class DefaultDayRepository @Inject constructor(
         return localDataSource.getAll()
     }
 
+    override suspend fun getLastDays(n: Int) : List<Day>{
+        return localDataSource.getLastDays(n)
+    }
+
+    override fun getLastDaysStream(n: Int) : Flow<List<Day>>{
+        return localDataSource.observeLastDays(n)
+    }
+
     override fun getDaysStream(): Flow<List<Day>> {
         return localDataSource.observeAll().map { days -> days }
     }
 
-    override suspend fun refreshDay(dayId: String) {
-    }
-
-    override fun getDayStream(dayId: String): Flow<Day?> {
+    override fun getDayStream(dayId: Long): Flow<Day?> {
         return localDataSource.observeById(dayId).map { it }
     }
 
@@ -94,15 +81,15 @@ class DefaultDayRepository @Inject constructor(
      *
      * @param dayId - The ID of the day
      */
-    override suspend fun getDay(dayId: String): Day? {
+    override suspend fun getDay(dayId: Long): Day? {
         return localDataSource.getById(dayId)
     }
 
-    override suspend fun completeDay(dayId: String) {
+    override suspend fun completeDay(dayId: Long) {
         localDataSource.updateCompleted(dayId = dayId, completed = true)
     }
 
-    override suspend fun activateDay(dayId: String) {
+    override suspend fun activateDay(dayId: Long) {
         localDataSource.updateCompleted(dayId = dayId, completed = false)
     }
 
@@ -114,8 +101,7 @@ class DefaultDayRepository @Inject constructor(
         localDataSource.deleteAll()
     }
 
-    override suspend fun deleteDay(dayId: String) {
+    override suspend fun deleteDay(dayId: Long) {
         localDataSource.deleteById(dayId)
     }
-
 }

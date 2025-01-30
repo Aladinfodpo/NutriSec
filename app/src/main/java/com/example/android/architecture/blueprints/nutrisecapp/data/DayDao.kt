@@ -42,7 +42,16 @@ interface DayDao {
      * @return the day with dayId.
      */
     @Query("SELECT * FROM Days WHERE id = :dayId")
-    fun observeById(dayId: String): Flow<Day>
+    fun observeById(dayId: Long): Flow<Day>
+
+    /**
+     * Observes last n days.
+     *
+     *@param n the number max of day.
+     *@return the last n days.
+     */
+    @Query("SELECT * FROM Days ORDER BY id DESC LIMIT :n")
+    fun observeLastDays(n: Int): Flow<List<Day>>
 
     /**
      * Select all days from the days table.
@@ -59,7 +68,16 @@ interface DayDao {
      * @return the day with dayId.
      */
     @Query("SELECT * FROM Days WHERE id = :dayId")
-    suspend fun getById(dayId: String): Day?
+    suspend fun getById(dayId: Long): Day?
+
+    /**
+     * Select last n days.
+     *
+     *@param n the number max of day.
+     *@return the last n days.
+     */
+    @Query("SELECT * FROM Days ORDER BY id DESC LIMIT :n")
+    suspend fun getLastDays(n: Int): List<Day>
 
     /**
      * Insert or update a day in the database. If a day already exists, replace it.
@@ -84,7 +102,7 @@ interface DayDao {
      * @param completed status to be updated
      */
     @Query("UPDATE Days SET isCompleted = :completed WHERE id = :dayId")
-    suspend fun updateCompleted(dayId: String, completed: Boolean)
+    suspend fun updateCompleted(dayId: Long, completed: Boolean)
 
     /**
      * Delete a day by id.
@@ -92,7 +110,7 @@ interface DayDao {
      * @return the number of days deleted. This should always be 1.
      */
     @Query("DELETE FROM Days WHERE id = :dayId")
-    suspend fun deleteById(dayId: String): Int
+    suspend fun deleteById(dayId: Long): Int
 
     /**
      * Delete all days.

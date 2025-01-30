@@ -66,7 +66,7 @@ import com.example.android.architecture.blueprints.nutrisecapp.util.DayDetailTop
 
 @Composable
 fun DayDetailScreen(
-    onEditDay: (String) -> Unit,
+    onEditDay: (Long) -> Unit,
     onBack: () -> Unit,
     onDeleteDay: () -> Unit,
     modifier: Modifier = Modifier,
@@ -90,7 +90,6 @@ fun DayDetailScreen(
             loading = uiState.isLoading,
             empty = uiState.day == null && !uiState.isLoading,
             day = uiState.day,
-            onRefresh = viewModel::refresh,
             onDayCheck = viewModel::setCompleted,
             modifier = Modifier.padding(paddingValues)
         )
@@ -119,7 +118,6 @@ private fun EditDayContent(
     empty: Boolean,
     day: Day?,
     onDayCheck: (Boolean) -> Unit,
-    onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val screenPadding = Modifier.padding(
@@ -177,11 +175,10 @@ private fun EditDayContentPreview() {
                 title = "Title",
                 description = "Description",
                 isCompleted = false,
-                id = "ID",
+                id = 1,
                 foods = mutableListOf(Food("Cerise",100, 200, 3), Food("Tomate",10, 2000, 333), Food("Cerise",100, 200, 3))
             ),
-            onDayCheck = { },
-            onRefresh = { }
+            onDayCheck = { }
         )
     }
 
@@ -198,10 +195,9 @@ private fun EditDayContentDayCompletedPreview() {
                 title = "Title",
                 description = "Description",
                 isCompleted = false,
-                id = "ID"
+                id = 1
             ),
-            onDayCheck = { },
-            onRefresh = { }
+            onDayCheck = { }
         )
     }
 }
@@ -217,10 +213,9 @@ private fun EditDayContentEmptyPreview() {
                 title = "Title",
                 description = "Description",
                 isCompleted = false,
-                id = "ID"
+                id = 1
             ),
-            onDayCheck = { },
-            onRefresh = { }
+            onDayCheck = { }
         )
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.nutrisecapp.util
+package com.example.android.architecture.blueprints.nutrisecapp.drawer
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,6 +35,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,10 +45,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.nutrisecapp.R
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinations
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecNavigationActions
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecTheme
+import com.example.android.architecture.blueprints.nutrisecapp.util.SettingsDataStore
+import com.example.android.architecture.blueprints.nutrisecapp.util.primaryDarkColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -57,8 +62,11 @@ fun AppModalDrawer(
     currentRoute: String,
     navigationActions: NutriSecNavigationActions,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    viewModel: DrawerViewModel = hiltViewModel(),
     content: @Composable () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -66,7 +74,11 @@ fun AppModalDrawer(
                 currentRoute = currentRoute,
                 navigateToDays = { navigationActions.navigateToDays() },
                 navigateToStatistics = { navigationActions.navigateToStatistics() },
-                closeDrawer = { coroutineScope.launch { drawerState.close() } }
+                closeDrawer = { coroutineScope.launch { drawerState.close() } },
+                navigateToCanIEatIt = {coroutineScope.launch {navigationActions.navigateToCanIEatIt(dayId = uiState.todayId)}},
+                navigateToToday = {coroutineScope.launch {
+                    navigationActions.navigateToAddEditDay(title = if (uiState.todayId != null) R.string.edit_day else R.string.add_day, dayId = uiState.todayId)
+                }}
             )
         }
     ) {
@@ -79,12 +91,32 @@ private fun AppDrawer(
     currentRoute: String,
     navigateToDays: () -> Unit,
     navigateToStatistics: () -> Unit,
+    navigateToToday:() -> Unit,
+    navigateToCanIEatIt:() -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
             DrawerHeader()
+            DrawerButton(
+                painter = painterResource(id = R.drawable.ic_add),
+                label = "Can I eat it ?",
+                isSelected = currentRoute == NutriSecDestinations.CAN_I_EAT_IT_ROUTE,
+                action = {
+                    navigateToCanIEatIt()
+                    closeDrawer()
+                }
+            )
+            DrawerButton(
+                painter = painterResource(id = R.drawable.ic_assignment_turned_in_24dp),
+                label = "Today",
+                isSelected = currentRoute == NutriSecDestinations.DAY_DETAIL_ROUTE,
+                action = {
+                    navigateToToday()
+                    closeDrawer()
+                }
+            )
             DrawerButton(
                 painter = painterResource(id = R.drawable.ic_list),
                 label = stringResource(id = R.string.list_title),
@@ -205,7 +237,9 @@ fun PreviewAppDrawer() {
                 currentRoute = NutriSecDestinations.DAYS_ROUTE,
                 navigateToDays = {},
                 navigateToStatistics = {},
-                closeDrawer = {}
+                closeDrawer = {},
+                navigateToToday = {},
+                navigateToCanIEatIt = {}
             )
         }
     }

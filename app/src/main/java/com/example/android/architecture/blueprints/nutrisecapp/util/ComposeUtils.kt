@@ -16,14 +16,24 @@
 
 package com.example.android.architecture.blueprints.nutrisecapp.util
 
+import android.graphics.Color.RGBToHSV
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -41,47 +51,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.example.android.architecture.blueprints.nutrisecapp.R
+import com.example.android.architecture.blueprints.nutrisecapp.data.Day
+import com.example.android.architecture.blueprints.nutrisecapp.data.Food
+import com.example.android.architecture.blueprints.nutrisecapp.data.maxCalorie
+import com.example.android.architecture.blueprints.nutrisecapp.days.pxToDp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
 
 val primaryDarkColor: Color = Color(0xFA264238)
-
-/**
- * Display an initial empty state or swipe to refresh content.
- *
- * @param loading (state) when true, display a loading spinner over [content]
- * @param empty (state) when true, display [emptyContent]
- * @param emptyContent (slot) the content to display for the empty state
- * @param onRefresh (event) event to request refresh
- * @param modifier the modifier to apply to this layout.
- * @param content (slot) the main content to show
- */
-@Composable
-fun LoadingContent(
-    loading: Boolean,
-    empty: Boolean,
-    emptyContent: @Composable () -> Unit,
-    onRefresh: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    if (empty) {
-        emptyContent()
-    } else {
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(loading),
-            onRefresh = onRefresh,
-            modifier = modifier,
-            content = content,
-        )
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -176,6 +167,135 @@ fun CalculatorContent(){
             color = Color.White
         )
     }
+}
+
+@Composable
+fun TodayNotStarted(
+    modifier: Modifier,
+    onCreateToday: () -> Unit
+) {
+    Column(
+        modifier = modifier.imePadding().fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(18.dp, Alignment.CenterVertically)
+    ) {
+        Text(
+            "Today has not started.",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+        ElevatedButton(
+            onClick = onCreateToday,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        ) { Text("Start today's tracking") }
+    }
+}
+
+@Composable
+fun DayItemProgressBar(
+    day: Day,
+    foods: List<Food>,
+    onDayClick: (Day) -> Unit
+){
+    var size by remember { mutableStateOf(IntSize.Zero) }
+
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(
+            horizontal = dimensionResource(id = R.dimen.horizontal_margin),
+            vertical = dimensionResource(id = R.dimen.list_item_padding),
+        )
+        .clip(RoundedCornerShape(25.dp))
+        .background(Color(230, 230, 250))
+        .clickable { onDayClick(day) }
+        .border(1.dp, Color.Gray, shape = RoundedCornerShape(25.dp))
+        .onGloballyPositioned { size = it.size }
+    ) {
+        val dayCal = day.getCalDay
+        val p = max(min(dayCal/ maxCalorie.toFloat(), 1.3F),0.8F)
+        val p1 = ((p-0.8F)*2.0F).pow(0.7F)
+        val hsvRed = FloatArray(3)
+        val hsvGreen = FloatArray(3)
+        RGBToHSV(210, 20, 20, hsvRed)
+        RGBToHSV(0, 200, 20, hsvGreen)
+        val colorInt = Color.hsv(
+            (hsvGreen[0] * (1 - p1) + p1 * hsvRed[0]),
+            (hsvGreen[1] * (1 - p1) + p1 * hsvRed[1]),
+            (hsvGreen[2] * (1 - p1) + p1.pow(0.8F) * hsvRed[2]),
+        )
+        Row() {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(if(foods.sumOf { it.calories } > 0)  0.dp else 25.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                colorInt.copy(alpha = 1.0F),
+                                colorInt.copy(alpha = 0.9F),
+                                colorInt.copy(alpha = 0.8F),
+                                colorInt.copy(alpha = 0.5F)
+                            )
+                        )
+                    )
+                    .width(size.width.pxToDp() * min(1.0F, dayCal / maxCalorie.toFloat()))
+                    .height(size.height.pxToDp())
+            )
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(0.dp,25.dp,25.dp))
+                    .background(Brush.horizontalGradient(
+                        listOf(Color(200, 200, 0), Color(200, 200, 0, alpha = 128))
+                    ))
+                    .padding(start =
+                        size.width.pxToDp() * min(
+                            1.0F,
+                            foods.sumOf { it.calories } / maxCalorie.toFloat()
+                        )
+                    )
+                    .height(size.height.pxToDp())
+            )
+        }
+
+        Column() {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = day.titleForList,
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(
+                        start = dimensionResource(id = R.dimen.horizontal_margin)
+                    ),
+                    textDecoration = null
+
+                )
+            }
+            val addCal = foods.sumOf { it.calories }.let{if(it > 0 ) "+$it" else ""}
+            Text("$dayCal$addCal/$maxCalorie kcal", modifier = Modifier.padding(start = 16.dp))
+        }
+    }
+}
+
+
+@Preview
+@Composable
+private fun DayItemProgressBarWithNewFoodPreview(){
+    DayItemProgressBar(
+        Day("01/02/25", id = 1, foods = listOf(Food("sucre",1500,1000,100))),
+        listOf(Food("sucre",100,1200,100)),
+        {}
+    )
+}
+
+@Preview
+@Composable
+private fun DayItemProgressBarPreview(){
+    DayItemProgressBar(
+        Day("01/02/25", id = 1, foods = listOf(Food("sucre",1500,1000,100))),
+        emptyList(),
+        {}
+    )
 }
 
 @Preview

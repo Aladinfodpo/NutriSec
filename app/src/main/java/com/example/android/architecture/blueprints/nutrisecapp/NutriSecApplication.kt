@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.nutrisecapp
 
 import android.app.Application
+import com.example.android.architecture.blueprints.nutrisecapp.util.SettingsDataStore
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import timber.log.Timber.DebugTree

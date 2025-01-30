@@ -36,10 +36,11 @@ import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinati
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinationsArgs.TITLE_ARG
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecDestinationsArgs.USER_MESSAGE_ARG
 import com.example.android.architecture.blueprints.nutrisecapp.addeditday.AddEditDayScreen
+import com.example.android.architecture.blueprints.nutrisecapp.canIEatIt.CanIEatItScreen
 import com.example.android.architecture.blueprints.nutrisecapp.statistics.StatisticsScreen
 import com.example.android.architecture.blueprints.nutrisecapp.daydetail.DayDetailScreen
 import com.example.android.architecture.blueprints.nutrisecapp.days.DaysScreen
-import com.example.android.architecture.blueprints.nutrisecapp.util.AppModalDrawer
+import com.example.android.architecture.blueprints.nutrisecapp.drawer.AppModalDrawer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -87,23 +88,26 @@ fun NutriSecNavGraph(
             NutriSecDestinations.ADD_EDIT_DAY_ROUTE,
             arguments = listOf(
                 navArgument(TITLE_ARG) { type = NavType.IntType },
-                navArgument(DAY_ID_ARG) { type = NavType.StringType; nullable = true },
+                navArgument(DAY_ID_ARG) { type = NavType.LongType},
             )
         ) { entry ->
-            val taskId = entry.arguments?.getString(DAY_ID_ARG)
+            val taskId = entry.arguments?.getLong(DAY_ID_ARG)
             AddEditDayScreen(
                 topBarTitle = entry.arguments?.getInt(TITLE_ARG)!!,
                 onDayUpdate = {
                     navActions.navigateToDays(
-                        if (taskId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
+                        if (taskId == 0L) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
                     )
                 },
                 onBack = { navActions.navigateToDays(
-                    if (taskId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
+                    if (taskId == 0L) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
                 ) }
             )
         }
-        composable(NutriSecDestinations.DAY_DETAIL_ROUTE) {
+        composable(NutriSecDestinations.DAY_DETAIL_ROUTE,
+            arguments = listOf(
+                navArgument(DAY_ID_ARG) { type = NavType.LongType}
+            )) {
             DayDetailScreen(
                 onEditDay = { taskId ->
                     navActions.navigateToAddEditDay(R.string.edit_day, taskId)
@@ -111,6 +115,16 @@ fun NutriSecNavGraph(
                 onBack = { navController.popBackStack() },
                 onDeleteDay = { navActions.navigateToDays(DELETE_RESULT_OK) }
             )
+        }
+        composable(NutriSecDestinations.CAN_I_EAT_IT_ROUTE,
+            arguments = listOf(
+                navArgument(DAY_ID_ARG) { type = NavType.LongType}
+            )) {
+            AppModalDrawer(drawerState, currentRoute, navActions) {
+                CanIEatItScreen(
+                    openDrawer = { coroutineScope.launch { drawerState.open() } },
+                )
+            }
         }
     }
 }

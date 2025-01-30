@@ -57,7 +57,8 @@ object DatabaseModule {
             context.applicationContext,
             NutriSecDatabase::class.java,
             "Days.db"
-        ).addMigrations(MIGRATION_2_3).build()
+        ).addMigrations(MIGRATION_2_3)
+            .fallbackToDestructiveMigration().build()
     }
 
     @Provides

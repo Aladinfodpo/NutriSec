@@ -112,6 +112,7 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.androidx.test.espresso.idling.resources)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.datastore.preferences.v112)
 
     // Architecture Components
     implementation(libs.room.runtime)

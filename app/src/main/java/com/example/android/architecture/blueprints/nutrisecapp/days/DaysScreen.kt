@@ -16,22 +16,28 @@
 
 package com.example.android.architecture.blueprints.nutrisecapp.days
 
+import android.graphics.Color.RGBToHSV
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -43,26 +49,37 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.nutrisecapp.R
-import com.example.android.architecture.blueprints.nutrisecapp.NutriSecTheme
 import com.example.android.architecture.blueprints.nutrisecapp.data.Day
+import com.example.android.architecture.blueprints.nutrisecapp.data.Food
+import com.example.android.architecture.blueprints.nutrisecapp.data.maxCalorie
 import com.example.android.architecture.blueprints.nutrisecapp.days.DaysFilterType.ACTIVE_DAYS
 import com.example.android.architecture.blueprints.nutrisecapp.days.DaysFilterType.ALL_DAYS
 import com.example.android.architecture.blueprints.nutrisecapp.days.DaysFilterType.COMPLETED_DAYS
-import com.example.android.architecture.blueprints.nutrisecapp.util.LoadingContent
+import com.example.android.architecture.blueprints.nutrisecapp.util.DayItemProgressBar
 import com.example.android.architecture.blueprints.nutrisecapp.util.DaysTopAppBar
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
 
 @Composable
 fun DaysScreen(
@@ -140,12 +157,10 @@ private fun DaysContent(
     onDayCheckedChange: (Day, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LoadingContent(
-        loading = loading,
-        empty = days.isEmpty() && !loading,
-        emptyContent = { DaysEmptyContent(noDaysLabel, noDaysIconRes, modifier) },
-        onRefresh = onRefresh
-    ) {
+    if(days.isEmpty() && !loading) {
+        DaysEmptyContent(noDaysLabel, noDaysIconRes, modifier)
+    }
+    else{
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -161,10 +176,10 @@ private fun DaysContent(
             )
             LazyColumn {
                 items(days) { day ->
-                    DayItem(
+                    DayItemProgressBar (
                         day = day,
-                        onDayClick = onDayClick,
-                        onCheckedChange = { }
+                        foods = emptyList(),
+                        onDayClick = onDayClick
                     )
                 }
             }
@@ -173,35 +188,8 @@ private fun DaysContent(
 }
 
 @Composable
-private fun DayItem(
-    day: Day,
-    onCheckedChange: (Boolean) -> Unit,
-    onDayClick: (Day) -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = dimensionResource(id = R.dimen.horizontal_margin),
-                vertical = dimensionResource(id = R.dimen.list_item_padding),
-            )
-            .clickable { onDayClick(day) }
-    ) {
-        Checkbox(
-            checked = !day.isBad,
-            onCheckedChange = onCheckedChange
-        )
-        Text(
-            text = day.titleForList,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(
-                start = dimensionResource(id = R.dimen.horizontal_margin)
-            ),
-            textDecoration = null
-
-        )
-    }
+fun Int.pxToDp() = with(LocalDensity.current) {
+    this@pxToDp.toDp()
 }
 
 @Composable
@@ -233,34 +221,67 @@ private fun DaysContentPreview() {
                 loading = false,
                 days = listOf(
                     Day(
-                        title = "Title 1",
+                        title = "01/01/20",
                         description = "Description 1",
                         isCompleted = false,
-                        id = "ID 1"
+                        foods = listOf(Food("Sucre", 100, 3500,100)),
+                        id = -1
                     ),
                     Day(
-                        title = "Title 2",
+                        title = "01/01/20",
+                        description = "Description 1",
+                        isCompleted = false,
+                        foods = listOf(Food("Sucre", 100, 3000,100)),
+                        id = 1
+                    ),
+                    Day(
+                        title = "02/01/20",
                         description = "Description 2",
                         isCompleted = true,
-                        id = "ID 2"
+                        foods = listOf(Food("Sucre", 100, 2700,100)),
+                        id = 2
                     ),
                     Day(
-                        title = "Title 3",
+                        title = "02.5/01/20",
+                        description = "Description 2",
+                        isCompleted = true,
+                        foods = listOf(Food("Sucre", 100, 2500,100)),
+                        id = 2
+                    ),
+                    Day(
+                        title = "03/01/20",
                         description = "Description 3",
                         isCompleted = true,
-                        id = "ID 3"
+                        foods = listOf(Food("Sucre", 100, 2200,100)),
+                        id = 3
                     ),
                     Day(
-                        title = "Title 4",
+                        title = "03.5/01/20",
+                        description = "Description 3",
+                        isCompleted = true,
+                        foods = listOf(Food("Sucre", 100, 2000,100)),
+                        id = 3
+                    ),
+                    Day(
+                        title = "04/01/20",
                         description = "Description 4",
-                        isCompleted = false,
-                        id = "ID 4"
+                        isCompleted = true,
+                        foods = listOf(Food("Sucre", 100, 1500,100)),
+                        id = 4
                     ),
                     Day(
-                        title = "Title 5",
+                        title = "05/01/20",
                         description = "Description 5",
                         isCompleted = true,
-                        id = "ID 5"
+                        foods = listOf(Food("Sucre", 100, 1000,100)),
+                        id = 5
+                    ),
+                    Day(
+                        title = "06/01/20",
+                        description = "Description 5",
+                        isCompleted = true,
+                        foods = listOf(Food("Sucre", 100, 500,100)),
+                        id = 6
                     ),
                 ),
                 currentFilteringLabel = R.string.label_all,
@@ -293,52 +314,3 @@ private fun DaysContentEmptyPreview() {
     }
 }
 
-@Preview
-@Composable
-private fun DaysEmptyContentPreview() {
-    NutriSecTheme {
-        Surface {
-            DaysEmptyContent(
-                noDaysLabel = R.string.no_days_all,
-                noDaysIconRes = R.drawable.logo_no_fill
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun DayItemPreview() {
-    MaterialTheme {
-        Surface {
-            DayItem(
-                day = Day(
-                    title = "Title",
-                    description = "Description",
-                    id = "ID"
-                ),
-                onDayClick = { },
-                onCheckedChange = { }
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun DayItemCompletedPreview() {
-    MaterialTheme {
-        Surface {
-            DayItem(
-                day = Day(
-                    title = "Title",
-                    description = "Description",
-                    isCompleted = true,
-                    id = "ID"
-                ),
-                onDayClick = { },
-                onCheckedChange = { }
-            )
-        }
-    }
-}

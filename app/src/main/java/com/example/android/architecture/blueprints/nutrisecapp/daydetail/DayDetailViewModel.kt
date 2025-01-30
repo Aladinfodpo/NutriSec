@@ -54,7 +54,7 @@ class DayDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val dayId: String = savedStateHandle[NutriSecDestinationsArgs.DAY_ID_ARG]!!
+    val dayId: Long = savedStateHandle[NutriSecDestinationsArgs.DAY_ID_ARG]!!
 
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
@@ -105,14 +105,6 @@ class DayDetailViewModel @Inject constructor(
         } else {
             dayRepository.activateDay(day.id)
             showSnackbarMessage(R.string.day_marked_active)
-        }
-    }
-
-    fun refresh() {
-        _isLoading.value = true
-        viewModelScope.launch {
-            dayRepository.refreshDay(dayId)
-            _isLoading.value = false
         }
     }
 

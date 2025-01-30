@@ -25,6 +25,7 @@ import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.A
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.STATISTICS_SCREEN
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.DAYS_SCREEN
 import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.DAY_DETAIL_SCREEN
+import com.example.android.architecture.blueprints.nutrisecapp.NutriSecScreens.CAN_I_EAT_IT_SCREEN
 
 /**
  * Screens used in [NutriSecDestinations]
@@ -34,6 +35,7 @@ private object NutriSecScreens {
     const val STATISTICS_SCREEN = "statistics"
     const val DAY_DETAIL_SCREEN = "day"
     const val ADD_EDIT_DAY_SCREEN = "addEditDay"
+    const val CAN_I_EAT_IT_SCREEN = "canIEatIt"
 }
 
 /**
@@ -53,6 +55,7 @@ object NutriSecDestinations {
     const val STATISTICS_ROUTE = STATISTICS_SCREEN
     const val DAY_DETAIL_ROUTE = "$DAY_DETAIL_SCREEN/{$DAY_ID_ARG}"
     const val ADD_EDIT_DAY_ROUTE = "$ADD_EDIT_DAY_SCREEN/{$TITLE_ARG}?$DAY_ID_ARG={$DAY_ID_ARG}"
+    const val CAN_I_EAT_IT_ROUTE = "$CAN_I_EAT_IT_SCREEN/{$DAY_ID_ARG}"
 }
 
 /**
@@ -92,14 +95,30 @@ class NutriSecNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    fun navigateToDayDetail(dayId: String) {
+    fun navigateToDayDetail(dayId: Long) {
         navController.navigate("$DAY_DETAIL_SCREEN/$dayId")
     }
 
-    fun navigateToAddEditDay(title: Int, dayId: String?) {
+    fun navigateToCanIEatIt(dayId: Long?) {
+        navController.navigate("$CAN_I_EAT_IT_SCREEN/" + (if (dayId != null) "$dayId" else "0")){
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+        }
+    }
+
+    fun navigateToAddEditDay(title: Int, dayId: Long?) {
         navController.navigate(
             "$ADD_EDIT_DAY_SCREEN/$title".let {
-                if (dayId != null) "$it?$DAY_ID_ARG=$dayId" else it
+                if (dayId != null) "$it?$DAY_ID_ARG=$dayId" else "$it?$DAY_ID_ARG=0"
             }
         )
     }

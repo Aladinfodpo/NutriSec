@@ -52,12 +52,12 @@ class AddEditDayViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val dayId: String? = savedStateHandle[NutriSecDestinationsArgs.DAY_ID_ARG]
+    private val dayId: Long? = savedStateHandle.get<Long>(NutriSecDestinationsArgs.DAY_ID_ARG).let{ it: Long? -> if(it == 0L) null else it}
 
     // A MutableStateFlow needs to be created in this ViewModel. The source of truth of the current
     // editable Day is the ViewModel, we need to mutate the UI state directly in methods such as
     // `updateTitle` or `updateDescription`
-    private val _uiState = MutableStateFlow(AddEditDayUiState(Day(id = savedStateHandle[NutriSecDestinationsArgs.DAY_ID_ARG]?: "")))
+    private val _uiState = MutableStateFlow(AddEditDayUiState(Day(id = savedStateHandle[NutriSecDestinationsArgs.DAY_ID_ARG]?: 0)))
     val uiState: StateFlow<AddEditDayUiState> = _uiState.asStateFlow()
 
     init {
@@ -179,11 +179,7 @@ class AddEditDayViewModel @Inject constructor(
     }
 
     private fun createNewDay() = viewModelScope.launch {
-        dayRepository.createDay( title = uiState.value.day.title,
-                                description = uiState.value.day.description,
-                                foods = uiState.value.day.foods,
-                                cardio = uiState.value.day.calCardio,
-                                weight = uiState.value.day.weight)
+        dayRepository.createDay( day = uiState.value.day)
         _uiState.update {
             it.copy(isDaySaved = true)
         }
@@ -194,21 +190,14 @@ class AddEditDayViewModel @Inject constructor(
             throw RuntimeException("updateDay() was called but day is new.")
         }
         viewModelScope.launch {
-            dayRepository.updateDay(
-                dayId = uiState.value.day.id,
-                title = uiState.value.day.title,
-                description = uiState.value.day.description,
-                foods = uiState.value.day.foods,
-                cardio = uiState.value.day.calCardio,
-                weight = uiState.value.day.weight
-            )
+            dayRepository.updateDay(day = uiState.value.day)
             _uiState.update {
                 it.copy(isDaySaved = true)
             }
         }
     }
 
-    private fun loadDay(dayId: String) {
+    private fun loadDay(dayId: Long) {
         _uiState.update {
             it.copy(isLoading = true)
         }
