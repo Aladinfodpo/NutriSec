@@ -16,17 +16,21 @@
 
 package com.example.android.architecture.blueprints.nutrisecapp.daydetail
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -50,7 +54,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -63,6 +69,7 @@ import com.example.android.architecture.blueprints.nutrisecapp.R
 import com.example.android.architecture.blueprints.nutrisecapp.data.Food
 import com.example.android.architecture.blueprints.nutrisecapp.data.Day
 import com.example.android.architecture.blueprints.nutrisecapp.util.DayDetailTopAppBar
+import com.example.android.architecture.blueprints.nutrisecapp.util.primaryDarkColor
 
 @Composable
 fun DayDetailScreen(
@@ -124,40 +131,87 @@ private fun EditDayContent(
         horizontal = dimensionResource(id = R.dimen.horizontal_margin),
         vertical = dimensionResource(id = R.dimen.vertical_margin),
     )
-    val commonModifier = modifier
-        .fillMaxWidth()
-        .then(screenPadding)
 
     if (day != null) {
-            LazyColumn(modifier = commonModifier
-                .padding(all = dimensionResource(id = R.dimen.horizontal_margin))) {
-                item{
-                    Text(text = day.title, style = MaterialTheme.typography.headlineSmall)
+            Column(modifier = modifier
+                .fillMaxSize().padding(6.dp)){
+                Text(text = day.title, style = MaterialTheme.typography.headlineSmall)
+                LazyColumn(modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(2.9F)
+                    .padding(start = 12.dp, end = 12.dp, top = 12.dp)) {
+
+                    itemsIndexed(day.foods) { i, food ->
+
+                        Column(modifier = Modifier.padding(vertical = 5.dp).border(2.dp, primaryDarkColor, shape = RoundedCornerShape(16.dp)).padding(6.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(6.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(food.quantity.toString() + " g of " + food.name, textAlign = TextAlign.Center)
+                                Row (horizontalArrangement = Arrangement.End) {
+                                    Text(
+                                        food.getNutriScoreString() + "/10",
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Cal: "   + food.calories.toString() + " kcal", textAlign = TextAlign.Center, modifier = Modifier.weight(0.25f))
+                                Text("Prot: "  + food.protein.toString()     + " g", textAlign = TextAlign.Center, modifier = Modifier.weight(0.25f))
+                                Text("Fat: "   + food.fat.toString()         + " g", textAlign = TextAlign.Center, modifier = Modifier.weight(0.25f))
+                                Text("Carbs: " + food.glucide.toString()     + " g", textAlign = TextAlign.Center, modifier = Modifier.weight(0.25f))
+                            }
+                        }
+
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+                            if(i != day.foods.size-1)
+                                Text("+", style = MaterialTheme.typography.headlineSmall )
+                        }
+                    }
+
                 }
-                items(day.foods) { food ->
-                    Row(modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween){
-                        Text(food.name, textAlign = TextAlign.Center)
-                        Text(food.quantity.toString() +" g", textAlign = TextAlign.Center)
-                        Text(food.calories.toString() + " kcal", textAlign = TextAlign.Center)
-                        Text(food.protein.toString()+" g", textAlign = TextAlign.Center)
+
+                Column(modifier = Modifier.fillMaxHeight().weight(1.0F), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally){
+
+                Text("-", style = MaterialTheme.typography.headlineSmall )
+                Text("Cardio : " + day.calCardio.toString() + " kcal", modifier = Modifier.border(2.dp, primaryDarkColor, shape = RoundedCornerShape(16.dp)).padding(6.dp))
+                Text("=", style = MaterialTheme.typography.headlineSmall )
+
+                val meal = Food.getMeal(day.foods)
+                Column(modifier = Modifier.padding(vertical = 5.dp).border(2.dp, primaryDarkColor, shape = RoundedCornerShape(16.dp)).padding(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(6.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Total of " + meal.quantity.toString() + " g", textAlign = TextAlign.Center)
+                        Row (horizontalArrangement = Arrangement.End) {
+                            Text(
+                                meal.getNutriScoreString() + "/10",
+                                textAlign = TextAlign.Center
+                            )
+                        }
+
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Cal: "   + meal.calories.toString() + " kcal", textAlign = TextAlign.Center, modifier = Modifier.weight(0.25f))
+                        Text("Prot: "  + meal.protein.toString()     + " g", textAlign = TextAlign.Center, modifier = Modifier.weight(0.25f))
+                        Text("Fat: "   + meal.fat.toString()         + " g", textAlign = TextAlign.Center, modifier = Modifier.weight(0.25f))
+                        Text("Carbs: " + meal.glucide.toString()     + " g", textAlign = TextAlign.Center, modifier = Modifier.weight(0.25f))
                     }
                 }
-                item{
-                    Text("Cardio : " +day.calCardio.toString()+" kcal")
-                    Row(modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround){
-                        Text("Total")
-                        Text(day.foods.sumOf { it.quantity }.toString())
-                        Text(day.getCalDay.toString())
-                        Text(day.foods.sumOf { it.protein  }.toString())
-                        Icon(if (day.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done")
-                    }
+
+                Text("Poids : " +day.weight.toString()+" kg", modifier = Modifier.padding(6.dp))
                 }
-                item{
-                    Spacer(Modifier.height(150.dp))
-                    Text("Poids : " +day.weight.toString()+" kg")
-                }
+
+
             }
 
     }
@@ -176,7 +230,7 @@ private fun EditDayContentPreview() {
                 description = "Description",
                 isCompleted = false,
                 id = 1,
-                foods = mutableListOf(Food("Cerise",100, 200, 3), Food("Tomate",10, 2000, 333), Food("Cerise",100, 200, 3))
+                foods = mutableListOf(Food("Cerise",100, 200, 3), Food("Tomate",10, 2000, 333), Food("Cerise",100, 200, 3), Food("Cerise",100, 200, 3), Food("Cerise",100, 200, 3), Food("Cerise",100, 200, 3), Food("Cerise",100, 200, 3), Food("Cerise",100, 200, 3))
             ),
             onDayCheck = { }
         )

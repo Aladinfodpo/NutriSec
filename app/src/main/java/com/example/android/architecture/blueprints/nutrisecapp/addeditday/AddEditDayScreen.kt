@@ -165,7 +165,7 @@ private fun AddEditDayContent(
             if(editTitle)
                 OutlinedTextField(
                     value = day.title,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
                     onValueChange = onTitleChanged,
                     placeholder = {
                         Text(
