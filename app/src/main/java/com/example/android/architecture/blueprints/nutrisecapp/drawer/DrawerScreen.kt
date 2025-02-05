@@ -76,8 +76,11 @@ fun AppModalDrawer(
                 navigateToStatistics = { navigationActions.navigateToStatistics() },
                 closeDrawer = { coroutineScope.launch { drawerState.close() } },
                 navigateToCanIEatIt = {coroutineScope.launch {navigationActions.navigateToCanIEatIt(dayId = uiState.todayId)}},
-                navigateToToday = {coroutineScope.launch {
-                    navigationActions.navigateToAddEditDay(title = if (uiState.todayId != null) R.string.edit_day else R.string.add_day, dayId = uiState.todayId)
+                navigateToToday = { coroutineScope.launch {
+                    if(uiState.todayId != null)
+                        navigationActions.navigateToDayDetail(dayId = uiState.todayId!!)
+                    else
+                        navigationActions.navigateToCanIEatIt(dayId = null)
                 }}
             )
         }
@@ -157,7 +160,7 @@ private fun DrawerHeader(
             .padding(dimensionResource(id = R.dimen.header_padding))
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logo_no_fill),
+            painter = painterResource(id = R.drawable.logo),
             contentDescription =
             stringResource(id = R.string.days_header_image_content_description),
             modifier = Modifier.width(dimensionResource(id = R.dimen.header_image_width))

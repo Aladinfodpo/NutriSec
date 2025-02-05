@@ -74,7 +74,7 @@ fun NutriSecNavGraph(
                     userMessage = entry.arguments?.getInt(USER_MESSAGE_ARG)!!,
                     onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
                     onAddDay = { navActions.navigateToAddEditDay(R.string.add_day, null) },
-                    onDayClick = { task -> navActions.navigateToDayDetail(task.id) },
+                    onDayClick = { day -> navActions.navigateToDayDetail(day.id) },
                     openDrawer = { coroutineScope.launch { drawerState.open() } }
                 )
             }
@@ -112,7 +112,7 @@ fun NutriSecNavGraph(
                 onEditDay = { taskId ->
                     navActions.navigateToAddEditDay(R.string.edit_day, taskId)
                 },
-                onBack = { navController.popBackStack() },
+                onBack = { if(navController.previousBackStackEntry != null) navController.popBackStack() },
                 onDeleteDay = { navActions.navigateToDays(DELETE_RESULT_OK) }
             )
         }
@@ -123,6 +123,7 @@ fun NutriSecNavGraph(
             AppModalDrawer(drawerState, currentRoute, navActions) {
                 CanIEatItScreen(
                     openDrawer = { coroutineScope.launch { drawerState.open() } },
+                    onDayProgressBarClick = {day -> navActions.navigateToDayDetail(day.id)}
                 )
             }
         }

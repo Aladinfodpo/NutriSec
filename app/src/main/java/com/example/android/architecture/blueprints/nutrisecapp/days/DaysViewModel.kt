@@ -166,7 +166,7 @@ class DaysViewModel @Inject constructor(
             ALL_DAYS -> {
                 FilteringUiInfo(
                     R.string.label_all, R.string.no_days_all,
-                    R.drawable.logo_no_fill
+                    R.drawable.logo
                 )
             }
             ACTIVE_DAYS -> {
@@ -190,5 +190,5 @@ const val DAYS_FILTER_SAVED_STATE_KEY = "DAYS_FILTER_SAVED_STATE_KEY"
 data class FilteringUiInfo(
     val currentFilteringLabel: Int = R.string.label_all,
     val noDaysLabel: Int = R.string.no_days_all,
-    val noDayIconRes: Int = R.drawable.logo_no_fill,
+    val noDayIconRes: Int = R.drawable.logo,
 )

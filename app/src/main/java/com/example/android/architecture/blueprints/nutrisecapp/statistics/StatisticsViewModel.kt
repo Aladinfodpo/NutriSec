@@ -39,7 +39,7 @@ data class StatisticsUiState(
     val isLoading: Boolean = false,
     val activeDaysPercent: Float = 0f,
     val completedDaysPercent: Float = 0f,
-    val weights: List<Double> = emptyList(),
+    val weights: List<Float> = emptyList(),
     val dates: List<String> = emptyList()
 )
 

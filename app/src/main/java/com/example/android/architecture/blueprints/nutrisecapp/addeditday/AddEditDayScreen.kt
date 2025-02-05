@@ -66,6 +66,8 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -90,6 +92,9 @@ import com.example.android.architecture.blueprints.nutrisecapp.util.primaryDarkC
 
 import com.example.android.architecture.blueprints.nutrisecapp.util.CalculatorContent
 import com.example.android.architecture.blueprints.nutrisecapp.util.DayItemProgressBar
+import com.example.android.architecture.blueprints.nutrisecapp.util.EditListFoodDay
+import com.example.android.architecture.blueprints.nutrisecapp.util.LayoutFoodParameter
+import java.util.Calendar
 
 @Composable
 fun AddEditDayScreen(
@@ -108,22 +113,16 @@ fun AddEditDayScreen(
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        AddEditDayContent(
-            loading = uiState.isLoading,
-            day = uiState.day,
-            onTitleChanged = viewModel::updateTitle,
-            onDescriptionChanged = viewModel::updateDescription,
-            onCardioChanged = viewModel::updateCardio,
-            onWeightChanged = viewModel::updateWeight,
-            onFoodNameChanged = viewModel::updateFoodIName,
-            onFoodQuantityChanged = viewModel::updateFoodIQuantity,
-            onFoodCalorieChanged = viewModel::updateFoodICalories,
-            onFoodProteinChanged = viewModel::updateFoodIProtein,
-            onAddFood = viewModel::addFood,
-            onRemoveFoodI = viewModel::removeFoodI,
-            onSaveDay = viewModel::saveDay,
-            modifier = Modifier.padding(paddingValues)
-        )
+        if(!uiState.isLoading)
+            AddEditDayContent(
+                day = uiState.day,
+                onTitleChanged = viewModel::updateTitle,
+                onDescriptionChanged = viewModel::updateDescription,
+                onCardioChanged = viewModel::updateCardio,
+                onWeightChanged = viewModel::updateWeight,
+                onSaveDay = viewModel::saveDay,
+                modifier = Modifier.padding(paddingValues)
+            )
 
         // Check if the day is saved and call onDayUpdate event
         LaunchedEffect(uiState.isDaySaved) {
@@ -145,28 +144,15 @@ fun AddEditDayScreen(
 
 @Composable
 private fun AddEditDayContent(
-    loading: Boolean,
     day: Day,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
-    onSaveDay: () -> Unit,
+    onSaveDay: (List<Food>) -> Unit,
     onCardioChanged: (String) -> Unit,
     onWeightChanged: (String) -> Unit,
-    onAddFood: () -> Unit,
-    onFoodNameChanged: (Int, String) -> Unit,
-    onFoodQuantityChanged: (Int, String) -> Unit,
-    onFoodCalorieChanged: (Int, String) -> Unit,
-    onFoodProteinChanged: (Int, String) -> Unit,
-    onRemoveFoodI: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
-        val textFieldColors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            cursorColor = Color.Black,
-            //unfocusedContainerColor = Color(red = 200, green = 200, blue = 200, alpha = 50)
-        )
         val numberEditableColors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = primaryDarkColor,
             unfocusedBorderColor = primaryDarkColor,
@@ -174,85 +160,26 @@ private fun AddEditDayContent(
         )
         Column(modifier = modifier.imePadding())
         {
-            DayItemProgressBar(day, emptyList(), {})
-            Box(modifier = Modifier.fillMaxWidth().padding(4.dp).weight(1.0F).border(4.dp, primaryDarkColor, shape = RoundedCornerShape(12.dp))) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth().padding(4.dp),
-                ) {
-                    item {
-                        OutlinedTextField(
-                            value = day.title,
-                            modifier = Modifier.fillMaxWidth(),
-                            onValueChange = onTitleChanged,
-                            placeholder = {
-                                Text(
-                                    text = stringResource(id = R.string.title_hint),
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                            },
-                            textStyle = MaterialTheme.typography.headlineSmall
-                                .copy(fontWeight = FontWeight.Bold),
-                            maxLines = 1,
-                            colors = textFieldColors
+            var editTitle by remember { mutableStateOf(false) }
+            DayItemProgressBar(day, emptyList(), onDayClick = { editTitle = !editTitle})
+            if(editTitle)
+                OutlinedTextField(
+                    value = day.title,
+                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = onTitleChanged,
+                    placeholder = {
+                        Text(
+                            text = stringResource(id = R.string.title_hint),
+                            style = MaterialTheme.typography.headlineSmall
                         )
-                    }
-
-
-                    itemsIndexed(day.foods) { i, food ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedTextField(
-                                value = food.name,
-                                onValueChange = { newValue -> onFoodNameChanged(i, newValue) },
-                                placeholder = { Text("Whey") },
-                                modifier = Modifier.weight(1.0F).padding(),
-                                colors = textFieldColors,
-                                maxLines = 1,
-                            )
-                            TextField(
-                                value = food.quantity.let { if (it == 0) "" else it.toString() },
-                                onValueChange = { newValue -> onFoodQuantityChanged(i, newValue) },
-                                modifier = Modifier.widthIn(1.dp, 80.dp),
-                                colors = textFieldColors,
-                                maxLines = 1,
-                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                            )
-                            TextField(
-                                value = food.calories.let { if (it == 0) "" else it.toString() },
-                                onValueChange = { newValue -> onFoodCalorieChanged(i, newValue) },
-                                modifier = Modifier.widthIn(1.dp, 80.dp),
-                                colors = textFieldColors,
-                                maxLines = 1,
-                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                            )
-                            TextField(
-                                value = food.protein.let { if (it == 0) "" else it.toString() },
-                                onValueChange = { newValue -> onFoodProteinChanged(i, newValue) },
-                                modifier = Modifier.widthIn(1.dp, 80.dp),
-                                colors = textFieldColors,
-                                maxLines = 1,
-                                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                            )
-                            ElevatedButton(
-                                onClick = { onRemoveFoodI(i) },
-                                modifier = Modifier.weight(1.0F)
-                            ) { Icon(Icons.Filled.Delete, "Delete") }
-                        }
-                    }
-                    item {
-                        ElevatedButton(
-                            onClick = onAddFood,
-                            modifier = modifier.fillMaxWidth()
-                        ) { Text("Add food") }
-                    }
-                }
-            }
+                    },
+                    textStyle = MaterialTheme.typography.headlineSmall
+                        .copy(fontWeight = FontWeight.Bold),
+                    maxLines = 1
+                )
+            val foods = remember { mutableStateListOf(*day.foods.toTypedArray()) }
+            val layoutFoodParameters = remember { MutableList(foods.size, init = {_ -> LayoutFoodParameter() }) }
+            EditListFoodDay(foods,layoutFoodParameters, Calendar.getInstance().get(Calendar.HOUR_OF_DAY), Calendar.getInstance().get(Calendar.MINUTE), showTime = true)
             OutlinedTextField(
                 value = day.calCardio.let { if (it == 0) "" else it.toString() },
                 onValueChange = onCardioChanged,
@@ -276,32 +203,33 @@ private fun AddEditDayContent(
                 Text(day.foods.sumOf { it.protein  }.toString())
                 Icon(if (day.isBad) Icons.Filled.Error else Icons.Filled.Done, "Day done", tint = if (day.isBad) Color.Red else primaryDarkColor)
             }
+            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+                var weight by remember { mutableStateOf("Loading") }
+                if(weight == "Loading" )
+                    weight = day.weight.toString()
 
-            var weight by remember { mutableStateOf("Loading") }
-            if(!loading && weight == "Loading" )
-                weight = day.weight.toString()
+                OutlinedTextField(
+                    value = weight,
+                    onValueChange = {it -> onWeightChanged(it); weight = it},
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                    colors = numberEditableColors,
+                    maxLines = 1,
+                    shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    label = { Text("Poids (couché)") },
+                    suffix = { Text("kg") }
+                )
 
-            OutlinedTextField(
-                value = weight,
-                onValueChange = {it -> onWeightChanged(it); weight = it},
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                colors = numberEditableColors,
-                maxLines = 1,
-                shape = RoundedCornerShape(12.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                label = { Text("Poids (couché)") },
-                suffix = { Text("kg") }
-            )
+                ElevatedButton(
+                    onClick = {onSaveDay(foods.toList())},
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 100.dp),
+                    colors = ButtonDefaults.buttonColors().copy(containerColor = primaryDarkColor)
+                ){
+                    Icon(imageVector = Icons.Filled.Done, contentDescription = "Finish",  tint = Color.White)
+                }
 
-            ElevatedButton(
-                onClick = onSaveDay,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                colors = ButtonDefaults.buttonColors().copy(containerColor = primaryDarkColor)
-            ){
-                Icon(imageVector = Icons.Filled.Done, contentDescription = "Finish",  tint = Color.White)
+                CalculatorContent()
             }
-
-            CalculatorContent()
         }
 
 }
@@ -311,7 +239,6 @@ private fun AddEditDayContent(
 private fun AddEditDayScreenPreview() {
     Surface {
         AddEditDayContent(
-            loading = false,
             day = Day(
                 title = "Title",
                 description = "Description",
@@ -324,12 +251,6 @@ private fun AddEditDayScreenPreview() {
             onDescriptionChanged = { },
             onCardioChanged = { },
             onWeightChanged = { },
-            onFoodNameChanged = {_, _ -> Unit },
-            onFoodQuantityChanged =  {_, _ -> Unit },
-            onFoodCalorieChanged = {_, _ -> Unit },
-            onFoodProteinChanged = {_, _ -> Unit },
-            onAddFood = {},
-            onRemoveFoodI = {},
             onSaveDay = {},
             modifier = Modifier
         )
@@ -341,7 +262,6 @@ private fun AddEditDayScreenPreview() {
 private fun FullAddEditDayScreenPreview() {
     Surface {
         AddEditDayContent(
-            loading = false,
             day = Day(
                 title = "Title",
                 description = "Description",
@@ -367,12 +287,6 @@ private fun FullAddEditDayScreenPreview() {
             onDescriptionChanged = { },
             onCardioChanged = { },
             onWeightChanged = { },
-            onFoodNameChanged = {_, _ -> Unit },
-            onFoodQuantityChanged =  {_, _ -> Unit },
-            onFoodCalorieChanged = {_, _ -> Unit },
-            onFoodProteinChanged = {_, _ -> Unit },
-            onAddFood = {},
-            onRemoveFoodI = {},
             onSaveDay = {},
             modifier = Modifier
         )
@@ -390,7 +304,6 @@ private fun AllPage(){
             floatingActionButton = { }
         ) { paddingValues ->
             AddEditDayContent(
-                loading = false,
                 day = Day(
                     title = "Title",
                     description = "Description",
@@ -416,12 +329,6 @@ private fun AllPage(){
                 onDescriptionChanged = { },
                 onCardioChanged = { },
                 onWeightChanged = { },
-                onFoodNameChanged = {_, _ -> Unit },
-                onFoodQuantityChanged =  {_, _ -> Unit },
-                onFoodCalorieChanged = {_, _ -> Unit },
-                onFoodProteinChanged = {_, _ -> Unit },
-                onAddFood = {},
-                onRemoveFoodI = {},
                 onSaveDay = {},
                 modifier = Modifier.padding(paddingValues)
             )

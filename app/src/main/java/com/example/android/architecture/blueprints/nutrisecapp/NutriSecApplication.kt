@@ -31,5 +31,6 @@ class NutriSecApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        SettingsDataStore.init(this)
     }
 }

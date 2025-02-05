@@ -67,7 +67,12 @@ class AddEditDayViewModel @Inject constructor(
     }
 
     // Called when clicking on fab.
-    fun saveDay() {
+    fun saveDay(foods: List<Food>) {
+
+        _uiState.update {
+            it.copy(day = it.day.copy(foods = foods))
+        }
+
         if (dayId == null) {
             createNewDay()
         } else {
@@ -93,75 +98,6 @@ class AddEditDayViewModel @Inject constructor(
         }
     }
 
-    fun addFood() {
-        _uiState.update {
-
-            val newFoods = it.day.foods + Food("", 0, 0 ,0)
-
-            it.copy(day = it.day.copy(foods = newFoods))
-        }
-    }
-
-    fun removeFoodI(iFood: Int){
-        _uiState.update {
-
-            val newFoods = it.day.foods.filterIndexed({i, _ -> i != iFood})
-
-            it.copy(day = it.day.copy(foods = newFoods))
-        }
-    }
-
-    fun updateFoodIName(iFood: Int, newName: String) {
-        _uiState.update {
-
-            val newFoods = it.day.foods.mapIndexed { i, food ->
-                if (i == iFood) food.copy(name = newName) else food
-            }
-
-            it.copy(day = it.day.copy(foods = newFoods))
-        }
-    }
-
-    fun updateFoodIQuantity(iFood: Int, newQuantity: String) {
-        var value = 0
-        newQuantity.toIntOrNull().let {it -> if(it != null && it < 3000) value = it}
-
-        _uiState.update {
-
-            val newFoods = it.day.foods.mapIndexed { i, food ->
-                if (i == iFood) food.copy(quantity = value) else food
-            }
-
-            it.copy(day = it.day.copy(foods = newFoods))
-        }
-    }
-
-    fun updateFoodICalories(iFood: Int, newCalories: String) {
-        var value = 0
-        newCalories.toIntOrNull().let {it -> if(it != null && it < 3000) value = it}
-        _uiState.update {
-
-            val newFoods = it.day.foods.mapIndexed { i, food ->
-                if (i == iFood) food.copy(calories = value) else food
-            }
-
-            it.copy(day = it.day.copy(foods = newFoods))
-        }
-    }
-
-    fun updateFoodIProtein(iFood: Int, newProtein: String) {
-        var value = 0
-        newProtein.toIntOrNull().let {it -> if(it != null && it < 100) value = it}
-
-        _uiState.update {
-            val newFoods = it.day.foods.mapIndexed { i, food ->
-                if (i == iFood) food.copy(protein = value) else food
-            }
-
-            it.copy(day = it.day.copy(foods = newFoods))
-        }
-    }
-
     fun updateCardio(newCardio: String) {
         var value = 0
         newCardio.toIntOrNull().let { if(it != null && it < 3000) value = it}
@@ -171,8 +107,8 @@ class AddEditDayViewModel @Inject constructor(
     }
 
     fun updateWeight(newWeight: String) {
-        var value = 0.0
-        newWeight.toDoubleOrNull().let { if(it != null) value = it}
+        var value = 0.0F
+        newWeight.toFloatOrNull().let { if(it != null) value = it}
         _uiState.update {
             it.copy(day = it.day.copy(weight = value))
         }

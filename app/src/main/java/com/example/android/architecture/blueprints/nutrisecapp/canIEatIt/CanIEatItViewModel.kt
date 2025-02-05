@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
 /**
  * UiState for the Add/Edit screen
@@ -68,6 +69,39 @@ class CanIEatItViewModel @Inject constructor(
 
         _uiState.update {
             it.copy(day = it.day!!.copy(foods = it.day.foods + foods))
+        }
+
+        updateDay()
+    }
+
+    fun unEatLastMeal(): List<Food>{
+        if(uiState.value.dayId == null) {
+            throw RuntimeException("updateDay() was called but day is new.")
+        }
+
+        if(_uiState.value.day!!.foods.isEmpty())
+            return emptyList()
+
+        val lastHour = _uiState.value.day!!.foods.last().hour
+        val lastMeal = _uiState.value.day!!.foods.filter{food: Food -> abs(food.hour - lastHour) <= 3  }
+        val foods = _uiState.value.day!!.foods.filter{food: Food -> abs(food.hour - lastHour) > 3 }
+
+        _uiState.update {
+            it.copy(day = it.day!!.copy(foods = foods ))
+        }
+
+        updateDay()
+
+        return lastMeal;
+    }
+
+    fun addCardio(cardio: Int){
+        if(uiState.value.dayId == null) {
+            throw RuntimeException("updateDay() was called but day is new.")
+        }
+
+        _uiState.update {
+            it.copy(day = it.day!!.copy(calCardio = it.day.calCardio + cardio))
         }
 
         updateDay()

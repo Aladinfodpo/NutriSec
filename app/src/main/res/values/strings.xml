@@ -15,7 +15,7 @@
      limitations under the License.
 -->
 <resources>
-    <string name="version">1.0.6</string>
+    <string name="version">1.0.9</string>
     <string name="app_name">NutriSec</string>
     <string name="add_day">New Day</string>
     <string name="edit_day">Edit Day</string>
