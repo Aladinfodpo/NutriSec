@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -39,10 +40,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -297,8 +302,18 @@ fun DayItemProgressBar(
             val addCal = foods.sumOf { it.calories }.let{if(it > 0 ) "+$it" else ""}
             Text("$dayCal$addCal/$maxCalorie kcal", modifier = Modifier.padding(start = 16.dp))
         }
-        Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp, end = 8.dp), horizontalArrangement = Arrangement.End) {
-            Text(Food.getMeal(day.foods).getNutriScoreString()+"/10", style = MaterialTheme.typography.headlineSmall,)
+        val oldScore = Food.getMeal(day.foods).getNutriScoreString()
+        val newScore = Food.getMeal(day.foods + foods).getNutriScoreString()
+        Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp, end = 8.dp), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+            Text(oldScore,
+                style = if(foods.isEmpty()) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.bodySmall,
+                modifier = if(foods.isEmpty()) Modifier else Modifier.padding(top = 2.dp)
+            )
+            if(foods.isNotEmpty()) {
+                Icon(Icons.AutoMirrored.Filled.ArrowRight,"to")
+                Text(newScore, style = MaterialTheme.typography.headlineSmall)
+            }
+            Text("/10", style = MaterialTheme.typography.headlineSmall)
         }
     }
 }
