@@ -178,7 +178,7 @@ private fun AddEditDayContent(
                     maxLines = 1
                 )
             val foods = remember { mutableStateListOf(*day.foods.toTypedArray()) }
-            val layoutFoodParameters = remember { MutableList(foods.size, init = {_ -> LayoutFoodParameter() }) }
+            val layoutFoodParameters = remember { mutableStateListOf(*MutableList(foods.size, init = {_ -> LayoutFoodParameter() }).toTypedArray()) }
             EditListFoodDay(foods,layoutFoodParameters, Calendar.getInstance().get(Calendar.HOUR_OF_DAY), Calendar.getInstance().get(Calendar.MINUTE), showTime = true)
             OutlinedTextField(
                 value = day.calCardio.let { if (it == 0) "" else it.toString() },
